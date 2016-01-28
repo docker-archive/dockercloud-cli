@@ -881,7 +881,7 @@ class RepositoryRmTestCase(unittest.TestCase):
     @mock.patch('dockercloudcli.commands.dockercloud.Repository.delete', return_value=True)
     @mock.patch('dockercloudcli.commands.dockercloud.Repository.fetch')
     def test_repository_rm(self, mock_fetch, mock_delete):
-        repository_rm(['repo1', 'repo2'], False)
+        repository_rm(['repo1', 'repo2'])
 
         self.assertEqual('repo1\nrepo2', self.buf.getvalue().strip())
         self.buf.truncate(0)
@@ -891,7 +891,7 @@ class RepositoryRmTestCase(unittest.TestCase):
     @mock.patch('dockercloudcli.commands.dockercloud.Repository.fetch')
     def test_repository_rm_with_exception(self, mock_fetch, mock_delete, mock_exit):
         mock_fetch.side_effect = [dockercloudcli.commands.dockercloud.Repository(), dockercloud.ApiError]
-        repository_rm(['repo1', 'repo2'], False)
+        repository_rm(['repo1', 'repo2'])
 
         self.assertEqual('repo1', self.buf.getvalue().strip())
         self.buf.truncate(0)

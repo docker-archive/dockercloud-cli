@@ -138,7 +138,8 @@ def service_redeploy(identifiers, not_reuse_volume, sync):
         try:
             service = dockercloud.Utils.fetch_remote_service(identifier)
             result = service.redeploy(not not_reuse_volume)
-            utils.sync_action(service, sync)
+            if not utils.sync_action(service, sync):
+                has_exception = True
             if result:
                 print(service.uuid)
         except Exception as e:
@@ -151,6 +152,7 @@ def service_redeploy(identifiers, not_reuse_volume, sync):
 def service_create(image, name, cpu_shares, memory, privileged, target_num_containers, run_command, entrypoint,
                    expose, publish, envvars, envfiles, tag, linked_to_service, autorestart, autodestroy, autoredeploy,
                    roles, sequential, volume, volumes_from, deployment_strategy, sync, net, pid):
+    has_exception = False
     try:
         ports = utils.parse_published_ports(publish)
 
@@ -190,17 +192,21 @@ def service_create(image, name, cpu_shares, memory, privileged, target_num_conta
                                              bindings=bindings,
                                              deployment_strategy=deployment_strategy, net=net, pid=pid)
         result = service.save()
-        utils.sync_action(service, sync)
+        if not utils.sync_action(service, sync):
+            has_exception = True
         if result:
             print(service.uuid)
     except Exception as e:
         print(e, file=sys.stderr)
+        has_exception = True
+    if has_exception:
         sys.exit(EXCEPTION_EXIT_CODE)
 
 
 def service_run(image, name, cpu_shares, memory, privileged, target_num_containers, run_command, entrypoint,
                 expose, publish, envvars, envfiles, tag, linked_to_service, autorestart, autodestroy, autoredeploy,
                 roles, sequential, volume, volumes_from, deployment_strategy, sync, net, pid):
+    has_exception = False
     try:
         ports = utils.parse_published_ports(publish)
 
@@ -241,11 +247,14 @@ def service_run(image, name, cpu_shares, memory, privileged, target_num_containe
                                              deployment_strategy=deployment_strategy, net=net, pid=pid)
         service.save()
         result = service.start()
-        utils.sync_action(service, sync)
+        if not utils.sync_action(service, sync):
+            has_exception = True
         if result:
             print(service.uuid)
     except Exception as e:
         print(e, file=sys.stderr)
+        has_exception = True
+    if has_exception:
         sys.exit(EXCEPTION_EXIT_CODE)
 
 
@@ -257,7 +266,8 @@ def service_scale(identifiers, target_num_containers, sync):
             service.target_num_containers = target_num_containers
             service.save()
             result = service.scale()
-            utils.sync_action(service, sync)
+            if not utils.sync_action(service, sync):
+                has_exception = True
             if result:
                 print(service.uuid)
         except Exception as e:
@@ -350,12 +360,14 @@ def service_set(identifiers, image, cpu_shares, memory, privileged, target_num_c
                     service.pid = pid
 
                 result = service.save()
-                utils.sync_action(service, sync)
+                if not utils.sync_action(service, sync):
+                    has_exception = True
                 if result:
                     if redeploy:
                         print("Redeploying Service ...")
                         result2 = service.redeploy()
-                        utils.sync_action(service, sync)
+                        if not utils.sync_action(service, sync):
+                            has_exception = True
                         if result2:
                             print(service.uuid)
                     else:
@@ -375,7 +387,8 @@ def service_start(identifiers, sync):
         try:
             service = dockercloud.Utils.fetch_remote_service(identifier)
             result = service.start()
-            utils.sync_action(service, sync)
+            if not utils.sync_action(service, sync):
+                has_exception = True
             if result:
                 print(service.uuid)
         except Exception as e:
@@ -391,7 +404,8 @@ def service_stop(identifiers, sync):
         try:
             service = dockercloud.Utils.fetch_remote_service(identifier)
             result = service.stop()
-            utils.sync_action(service, sync)
+            if not utils.sync_action(service, sync):
+                has_exception = True
             if result:
                 print(service.uuid)
         except Exception as e:
@@ -407,7 +421,8 @@ def service_terminate(identifiers, sync):
         try:
             service = dockercloud.Utils.fetch_remote_service(identifier)
             result = service.delete()
-            utils.sync_action(service, sync)
+            if not utils.sync_action(service, sync):
+                has_exception = True
             if result:
                 print(service.uuid)
         except Exception as e:
@@ -576,7 +591,8 @@ def container_redeploy(identifiers, not_reuse_volume, sync):
         try:
             container = dockercloud.Utils.fetch_remote_container(identifier)
             result = container.redeploy(not not_reuse_volume)
-            utils.sync_action(container, sync)
+            if not utils.sync_action(container, sync):
+                has_exception = True
             if result:
                 print(container.uuid)
         except Exception as e:
@@ -665,7 +681,8 @@ def container_start(identifiers, sync):
         try:
             container = dockercloud.Utils.fetch_remote_container(identifier)
             result = container.start()
-            utils.sync_action(container, sync)
+            if not utils.sync_action(container, sync):
+                has_exception = True
             if result:
                 print(container.uuid)
         except Exception as e:
@@ -681,7 +698,8 @@ def container_stop(identifiers, sync):
         try:
             container = dockercloud.Utils.fetch_remote_container(identifier)
             result = container.stop()
-            utils.sync_action(container, sync)
+            if not utils.sync_action(container, sync):
+                has_exception = True
             if result:
                 print(container.uuid)
         except Exception as e:
@@ -697,7 +715,8 @@ def container_terminate(identifiers, sync):
         try:
             container = dockercloud.Utils.fetch_remote_container(identifier)
             result = container.delete()
-            utils.sync_action(container, sync)
+            if not utils.sync_action(container, sync):
+                has_exception = True
             if result:
                 print(container.uuid)
         except Exception as e:
@@ -781,13 +800,12 @@ def repository_register(identifier, username, password):
         sys.exit(EXCEPTION_EXIT_CODE)
 
 
-def repository_rm(identifiers, sync):
+def repository_rm(identifiers):
     has_exception = False
     for identifier in identifiers:
         try:
             repository = dockercloud.Repository.fetch(identifier)
             result = repository.delete()
-            utils.sync_action(repository, sync)
             if result:
                 print(identifier)
         except Exception as e:
@@ -866,7 +884,8 @@ def node_rm(identifiers, sync):
         try:
             node = dockercloud.Utils.fetch_remote_node(identifier)
             result = node.delete()
-            utils.sync_action(node, sync)
+            if not utils.sync_action(node, sync):
+                has_exception = True
             if result:
                 print(node.uuid)
         except Exception as e:
@@ -882,7 +901,8 @@ def node_upgrade(identifiers, sync):
         try:
             node = dockercloud.Utils.fetch_remote_node(identifier)
             result = node.upgrade_docker()
-            utils.sync_action(node, sync)
+            if not utils.sync_action(node, sync):
+                has_exception = True
             if result:
                 print(node.uuid)
         except Exception as e:
@@ -1035,6 +1055,8 @@ def nodecluster_show_types(provider, region):
 
 def nodecluster_create(target_num_nodes, name, provider, region, nodetype, sync, disk, tags, aws_vpc_id,
                        aws_vpc_subnets, aws_vpc_security_groups, aws_iam_instance_profile_name):
+    has_exception = False
+
     region_uri = "/api/infra/%s/region/%s/%s/" % (API_VERSION, provider, region)
     nodetype_uri = "/api/infra/%s/nodetype/%s/%s/" % (API_VERSION, provider, nodetype)
 
@@ -1066,11 +1088,14 @@ def nodecluster_create(target_num_nodes, name, provider, region, nodetype, sync,
         nodecluster = dockercloud.NodeCluster.create(**args)
         nodecluster.save()
         result = nodecluster.deploy()
-        utils.sync_action(nodecluster, sync)
+        if not utils.sync_action(nodecluster, sync):
+                has_exception = True
         if result:
             print(nodecluster.uuid)
     except Exception as e:
         print(e, file=sys.stderr)
+        has_exception = True
+    if has_exception:
         sys.exit(EXCEPTION_EXIT_CODE)
 
 
@@ -1080,7 +1105,8 @@ def nodecluster_rm(identifiers, sync):
         try:
             nodecluster = dockercloud.Utils.fetch_remote_nodecluster(identifier)
             result = nodecluster.delete()
-            utils.sync_action(nodecluster, sync)
+            if not utils.sync_action(nodecluster, sync):
+                has_exception = True
             if result:
                 print(nodecluster.uuid)
         except Exception as e:
@@ -1097,7 +1123,8 @@ def nodecluster_scale(identifiers, target_num_nodes, sync):
             nodecluster = dockercloud.Utils.fetch_remote_nodecluster(identifier)
             nodecluster.target_num_nodes = target_num_nodes
             result = nodecluster.save()
-            utils.sync_action(nodecluster, sync)
+            if not utils.sync_action(nodecluster, sync):
+                has_exception = True
             if result:
                 print(nodecluster.uuid)
         except Exception as e:
@@ -1327,27 +1354,35 @@ def trigger_rm(identifier, trigger_identifiers):
 
 
 def stack_up(name, stackfile, sync):
+    has_exception = False
     try:
         stack = utils.load_stack_file(name=name, stackfile=stackfile)
         stack.save()
         result = stack.start()
-        utils.sync_action(stack, sync)
+        if not utils.sync_action(stack, sync):
+            has_exception = True
         if result:
             print(stack.uuid)
     except Exception as e:
         print(e, file=sys.stderr)
+        has_exception = True
+    if has_exception:
         sys.exit(EXCEPTION_EXIT_CODE)
 
 
 def stack_create(name, stackfile, sync):
+    has_exception = False
     try:
         stack = utils.load_stack_file(name=name, stackfile=stackfile)
         result = stack.save()
-        utils.sync_action(stack, sync)
+        if not utils.sync_action(stack, sync):
+            has_exception = True
         if result:
             print(stack.uuid)
     except Exception as e:
         print(e, file=sys.stderr)
+        has_exception = True
+    if has_exception:
         sys.exit(EXCEPTION_EXIT_CODE)
 
 
@@ -1397,7 +1432,8 @@ def stack_redeploy(identifiers, not_reuse_volume, sync):
         try:
             stack = dockercloud.Utils.fetch_remote_stack(identifier)
             result = stack.redeploy(not not_reuse_volume)
-            utils.sync_action(stack, sync)
+            if not utils.sync_action(stack, sync):
+                has_exception = True
             if result:
                 print(stack.uuid)
         except Exception as e:
@@ -1413,7 +1449,8 @@ def stack_start(identifiers, sync):
         try:
             stack = dockercloud.Utils.fetch_remote_stack(identifier)
             result = stack.start()
-            utils.sync_action(stack, sync)
+            if not utils.sync_action(stack, sync):
+                has_exception = True
             if result:
                 print(stack.uuid)
         except Exception as e:
@@ -1429,7 +1466,8 @@ def stack_stop(identifiers, sync):
         try:
             stack = dockercloud.Utils.fetch_remote_stack(identifier)
             result = stack.stop()
-            utils.sync_action(stack, sync)
+            if not utils.sync_action(stack, sync):
+                has_exception = True
             if result:
                 print(stack.uuid)
         except Exception as e:
@@ -1445,7 +1483,8 @@ def stack_terminate(identifiers, sync):
         try:
             stack = dockercloud.Utils.fetch_remote_stack(identifier)
             result = stack.delete()
-            utils.sync_action(stack, sync)
+            if not utils.sync_action(stack, sync):
+                has_exception = True
             if result:
                 print(stack.uuid)
         except Exception as e:
@@ -1456,15 +1495,19 @@ def stack_terminate(identifiers, sync):
 
 
 def stack_update(identifier, stackfile, sync):
+    has_exception = False
     try:
         stack = utils.load_stack_file(name=None, stackfile=stackfile,
                                       stack=dockercloud.Utils.fetch_remote_stack(identifier))
         result = stack.save()
-        utils.sync_action(stack, sync)
+        if not utils.sync_action(stack, sync):
+            has_exception = True
         if result:
             print(stack.uuid)
     except Exception as e:
         print(e, file=sys.stderr)
+        has_exception = True
+    if has_exception:
         sys.exit(EXCEPTION_EXIT_CODE)
 
 
@@ -1595,12 +1638,14 @@ def service_env_add(identifiers, envvars, envfiles, redeploy, sync):
             new_envvars.extend(existing_envvars)
             service.container_envvars = new_envvars
             result = service.save()
-            utils.sync_action(service, sync)
+            if not utils.sync_action(service, sync):
+                has_exception = True
             if result:
                 if redeploy:
                     print("Redeploying Service ...")
                     result2 = service.redeploy()
-                    utils.sync_action(service, sync)
+                    if not utils.sync_action(service, sync):
+                        has_exception = True
                     if result2:
                         print(service.uuid)
                 else:
@@ -1673,12 +1718,14 @@ def service_env_rm(identifiers, names, redeploy, sync):
 
             service.container_envvars = new_envvars
             result = service.save()
-            utils.sync_action(service, sync)
+            if not utils.sync_action(service, sync):
+                has_exception = True
             if result:
                 if redeploy:
                     print("Redeploying Service ...")
                     result2 = service.redeploy()
-                    utils.sync_action(service, sync)
+                    if not utils.sync_action(service, sync):
+                        has_exception = True
                     if result2:
                         print(service.uuid)
                 else:
@@ -1703,12 +1750,14 @@ def service_env_set(identifiers, envvars, envfiles, redeploy, sync):
             service = dockercloud.Utils.fetch_remote_service(identifier)
             service.container_envvars = input_envvars
             result = service.save()
-            utils.sync_action(service, sync)
+            if not utils.sync_action(service, sync):
+                has_exception = True
             if result:
                 if redeploy:
                     print("Redeploying Service ...")
                     result2 = service.redeploy()
-                    utils.sync_action(service, sync)
+                    if not utils.sync_action(service, sync):
+                        has_exception = True
                     if result2:
                         print(service.uuid)
                 else:
@@ -1752,12 +1801,14 @@ def service_env_update(identifiers, envvars, envfiles, redeploy, sync):
             new_envvars.extend(existing_envvars)
             service.container_envvars = new_envvars
             result = service.save()
-            utils.sync_action(service, sync)
+            if not utils.sync_action(service, sync):
+                has_exception = True
             if result:
                 if redeploy:
                     print("Redeploying Service ...")
                     result2 = service.redeploy()
-                    utils.sync_action(service, sync)
+                    if not utils.sync_action(service, sync):
+                        has_exception = True
                     if result2:
                         print(service.uuid)
                 else:

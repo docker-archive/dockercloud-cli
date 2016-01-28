@@ -368,6 +368,7 @@ def inject_env_var(services):
 def sync_action(obj, sync):
     import time
 
+    success = True
     action_uri = getattr(obj, "dockercloud_action_uri", "")
     if sync and action_uri:
         last_state = None
@@ -381,7 +382,11 @@ def sync_action(obj, sync):
                     last_state = action.state
                 else:
                     sys.stdout.write('.')
-                if action.state.lower() == "success" or action.state.lower() == "failed":
+                if action.state.lower() == "success":
+                    sys.stdout.write('\n')
+                    break
+                if action.state.lower() == "failed":
+                    success = False
                     sys.stdout.write('\n')
                     break
                 sys.stdout.flush()
@@ -391,7 +396,10 @@ def sync_action(obj, sync):
                 continue
             except Exception as e:
                 print(e, file=sys.stderr)
+                success = False
                 break
+
+    return success
 
 
 def container_service_log_handler(message):
