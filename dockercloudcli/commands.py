@@ -891,6 +891,7 @@ def node_upgrade(identifiers, sync):
     if has_exception:
         sys.exit(EXCEPTION_EXIT_CODE)
 
+
 def node_byo():
     token = ""
     try:

@@ -14,6 +14,7 @@ from dateutil import tz
 from tabulate import tabulate
 
 from exceptions import BadParameter, DockerNotFound, StreamOutputError
+from interpolation import interpolate_environment_variables
 
 
 def tabulate_result(data_list, headers):
@@ -317,9 +318,12 @@ def load_stack_file(name, stackfile, stack=None):
                                "Please specify which one you'd like to use with -f <filename>")
     with open(stackfile, 'r') as f:
         content = yaml.load(f.read())
+        interpolated_content = interpolate_environment_variables(content, 'service')
+
         services = []
-        if content:
-            for k, v in content.items():
+        if interpolated_content:
+            for k, v in interpolated_content.items():
+                print ()
                 v.update({"name": k})
                 services.append(v)
 
