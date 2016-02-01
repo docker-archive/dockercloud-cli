@@ -534,8 +534,6 @@ def add_repository_parser(subparsers):
     rm_parser = repository_subparser.add_parser('rm', help='Remove a third party repository from Docker Cloud',
                                                 description='Remove a third party repository from Docker Cloud')
     rm_parser.add_argument('repository_name', help='full repository name, i.e. quay.io/docker/test-repo', nargs='+')
-    rm_parser.add_argument('--sync', help='block the command until the async operation has finished',
-                           action='store_true')
 
     # docker-cloud repository update
     update_parser = repository_subparser.add_parser('update', help='Update a registered repository in Docker Cloud',

@@ -14,6 +14,7 @@ from dateutil import tz
 from tabulate import tabulate
 
 from exceptions import BadParameter, DockerNotFound, StreamOutputError
+from interpolation import interpolate_environment_variables
 
 
 def tabulate_result(data_list, headers):
@@ -317,9 +318,12 @@ def load_stack_file(name, stackfile, stack=None):
                                "Please specify which one you'd like to use with -f <filename>")
     with open(stackfile, 'r') as f:
         content = yaml.load(f.read())
+        interpolated_content = interpolate_environment_variables(content, 'service')
+
         services = []
-        if content:
-            for k, v in content.items():
+        if interpolated_content:
+            for k, v in interpolated_content.items():
+                print ()
                 v.update({"name": k})
                 services.append(v)
 
@@ -364,6 +368,7 @@ def inject_env_var(services):
 def sync_action(obj, sync):
     import time
 
+    success = True
     action_uri = getattr(obj, "dockercloud_action_uri", "")
     if sync and action_uri:
         last_state = None
@@ -377,7 +382,11 @@ def sync_action(obj, sync):
                     last_state = action.state
                 else:
                     sys.stdout.write('.')
-                if action.state.lower() == "success" or action.state.lower() == "failed":
+                if action.state.lower() == "success":
+                    sys.stdout.write('\n')
+                    break
+                if action.state.lower() == "failed":
+                    success = False
                     sys.stdout.write('\n')
                     break
                 sys.stdout.flush()
@@ -387,7 +396,10 @@ def sync_action(obj, sync):
                 continue
             except Exception as e:
                 print(e, file=sys.stderr)
+                success = False
                 break
+
+    return success
 
 
 def container_service_log_handler(message):

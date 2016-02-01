@@ -286,7 +286,7 @@ class CommandsDispatchTestCase(unittest.TestCase):
 
         args = self.parser.parse_args(['repository', 'rm', 'name'])
         dispatch_cmds(args)
-        mock_cmds.repository_rm(args.repository_name, args.sync)
+        mock_cmds.repository_rm(args.repository_name)
 
         args = self.parser.parse_args(['repository', 'update', 'name'])
         dispatch_cmds(args)

@@ -216,7 +216,7 @@ def dispatch_cmds(args):
         elif args.subcmd == 'register':
             commands.repository_register(args.repository_name, args.username, args.password)
         elif args.subcmd == 'rm':
-            commands.repository_rm(args.repository_name, args.sync)
+            commands.repository_rm(args.repository_name)
         elif args.subcmd == 'update':
             commands.repository_update(args.repository_name, args.username, args.password)
         elif args.subcmd == 'inspect':
