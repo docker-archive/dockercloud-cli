@@ -513,34 +513,34 @@ def add_repository_parser(subparsers):
     repository_subparser = repository_parser.add_subparsers(title='Docker Cloud repository commands', dest='subcmd')
 
     # docker-cloud repository ls
-    list_parser = repository_subparser.add_parser('ls', help="List user's repositories",
-                                                  description="List user's repositories")
+    list_parser = repository_subparser.add_parser('ls', help="List all registered external repositories",
+                                                  description="List all registered external repositories")
     list_parser.add_argument('-q', '--quiet', help='print only repository names', action='store_true')
 
     # docker-cloud repository inspect
-    inspect_parser = repository_subparser.add_parser('inspect', help='Inspect a repository',
-                                                     description='Inspect a repository')
+    inspect_parser = repository_subparser.add_parser('inspect', help='Inspect an external repository',
+                                                     description='Inspect an external repository')
     inspect_parser.add_argument('identifier', help="repository name", nargs='+')
 
     # docker-cloud repository register
     register_parser = repository_subparser.add_parser('register',
-                                                      help='Register a third party repository in Docker Cloud',
-                                                      description='Register a third party repository in Docker Cloud')
+                                                      help='Register an external repository in Docker Cloud',
+                                                      description='Register an external repository in Docker Cloud')
     register_parser.add_argument('repository_name', help='full repository name, i.e. quay.io/docker/test-repo')
-    register_parser.add_argument('-u', '--username', help='Username of the private registry')
-    register_parser.add_argument('-p', '--password', help='Password of the private registry')
+    register_parser.add_argument('-u', '--username', help='username to authenticate with the external registry')
+    register_parser.add_argument('-p', '--password', help='password to authenticate with the external registry')
 
     # docker-cloud repository rm
-    rm_parser = repository_subparser.add_parser('rm', help='Remove a third party repository from Docker Cloud',
-                                                description='Remove a third party repository from Docker Cloud')
+    rm_parser = repository_subparser.add_parser('rm', help='Remove an external repository from Docker Cloud',
+                                                description='Remove an external repository from Docker Cloud')
     rm_parser.add_argument('repository_name', help='full repository name, i.e. quay.io/docker/test-repo', nargs='+')
 
     # docker-cloud repository update
     update_parser = repository_subparser.add_parser('update', help='Update a registered repository in Docker Cloud',
                                                     description='Update a registered repository in Docker Cloud')
     update_parser.add_argument("repository_name", help="full repository name, i.e. quay.io/docker/test-repo", nargs="+")
-    update_parser.add_argument('-u', '--username', help='new username to authenticate with the registry')
-    update_parser.add_argument('-p', '--password', help='new password to authenticate with the registry')
+    update_parser.add_argument('-u', '--username', help='new username to authenticate with the external registry')
+    update_parser.add_argument('-p', '--password', help='new password to authenticate with the external registry')
 
 
 def add_node_parser(subparsers):

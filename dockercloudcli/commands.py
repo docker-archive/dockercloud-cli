@@ -728,21 +728,16 @@ def container_terminate(identifiers, sync):
 
 def repository_ls(quiet):
     try:
-        headers = ["NAME", "#TAG", "IN_USE", "PRIVATE"]
+        headers = ["NAME", "IN_USE"]
         data_list = []
         name_list = []
 
         repositories = dockercloud.Repository.list()
         if len(repositories) != 0:
             for repository in repositories:
-                data = [repository.name, len(repository.tags)]
+                data = [repository.name]
 
                 if repository.in_use:
-                    data.append("yes")
-                else:
-                    data.append("no")
-
-                if repository.is_private_image:
                     data.append("yes")
                 else:
                     data.append("no")
@@ -750,7 +745,7 @@ def repository_ls(quiet):
                 data_list.append(data)
                 name_list.append(repository.name)
         else:
-            data_list.append(["", "", ""])
+            data_list.append(["", ""])
 
         if quiet:
             for name in name_list:

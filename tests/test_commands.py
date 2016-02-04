@@ -809,9 +809,9 @@ class RepositoryListTestCase(unittest.TestCase):
 
     @mock.patch('dockercloudcli.commands.dockercloud.Repository.list')
     def test_repository_list(self, mock_list):
-        output = u'''NAME                                                #TAG  IN_USE    PRIVATE
-r-staging.dockercloud.co/admin/tutum-sdk               1  no        yes
-r-staging.dockercloud.co/admin/python-quickstart       1  no        yes'''
+        output = u'''NAME                                              IN_USE
+r-staging.dockercloud.co/admin/tutum-sdk          no
+r-staging.dockercloud.co/admin/python-quickstart  no'''
         mock_list.return_value = self.repositorylist
         repository_ls(False)
 
