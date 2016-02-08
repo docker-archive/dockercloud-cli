@@ -52,7 +52,11 @@ You will have to pass your username and password as environment variables, as th
 
 To make things easier, you might want to use an alias for it:
 
-    alias docker-cloud="docker run -it -v /usr/bin/docker:/usr/bin/docker -v /var/run/docker.sock:/var/run/docker.sock -e DOCKERCLOUD_USER=username -e DOCKERCLOUD_PASS=password --rm dockercloud/cli"
+    alias docker-cloud="docker run -it -e DOCKERCLOUD_USER=username -e DOCKERCLOUD_PASS=password --rm dockercloud/cli"
+
+or
+
+    alias docker-cloud="docker run -it -v ~/.docker:/root/.docker:ro --rm dockercloud/cli container ps"
 
 Then, you can run commands like:
 
