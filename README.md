@@ -56,7 +56,7 @@ To make things easier, you might want to use an alias for it:
 
 or
 
-    alias docker-cloud="docker run -it -v ~/.docker:/root/.docker:ro --rm dockercloud/cli container ps"
+    alias docker-cloud="docker run -it -v ~/.docker:/root/.docker:ro --rm dockercloud/cli"
 
 Then, you can run commands like:
 
