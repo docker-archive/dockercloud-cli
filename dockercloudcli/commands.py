@@ -32,18 +32,6 @@ Alternatively, you can set the following environment variables:
 ''')
 
 
-def verify_auth(args):
-    if args.cmd != 'login':
-        try:
-            dockercloud.api.http.send_request("GET", "/".join(["api", "tutum", API_VERSION, "auth"]))
-        except dockercloud.AuthError:
-            print('Not Authorized, Please login using "docker login"', file=sys.stderr)
-            exit(AUTH_ERROR_EXIT_CODE)
-        except dockercloud.ApiError as e:
-            print(e, file=sys.stderr)
-            exit(EXCEPTION_EXIT_CODE)
-
-
 def event():
     try:
         events = dockercloud.Events()
