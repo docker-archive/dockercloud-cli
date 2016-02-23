@@ -298,7 +298,6 @@ def main():
     parser = initialize_parser()
     argv = patch_help_option(sys.argv)
     args = parser.parse_args(argv)
-    commands.verify_auth(args)
     dispatch_cmds(args)
 
 

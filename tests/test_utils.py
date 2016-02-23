@@ -114,3 +114,19 @@ class ParseEnvironmentVariablesTestCase(unittest.TestCase):
     def test_parse_envvars(self):
         output = [{'key': 'MYSQL_PASS', 'value': 'mypass'}, {'key': 'MYSQL_USER', 'value': 'admin'}]
         self.assertEqual(output, parse_envvars(['MYSQL_USER=admin', 'MYSQL_PASS=mypass'], []))
+
+
+class GetStackfileName(unittest.TestCase):
+    def test_get_stackfile_name_not_empty_name(self):
+        self.assertEqual("abc", get_stackfile_name("abc"))
+
+    @mock.patch('dockercloudcli.utils.os.path.exists')
+    def test_get_stackfile_name_empty_name(self, mock_exist):
+        mock_exist.side_effect = [False, False, False]
+        self.assertRaises(BadParameter, get_stackfile_name, "")
+        mock_exist.side_effect = [True, True, True]
+        self.assertEqual("docker-cloud.yml", get_stackfile_name(""))
+        mock_exist.side_effect = [False, True, True]
+        self.assertEqual("tutum.yml", get_stackfile_name(""))
+        mock_exist.side_effect = [False, False, True]
+        self.assertEqual("docker-compose.yml", get_stackfile_name(""))

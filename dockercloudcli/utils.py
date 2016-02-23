@@ -13,7 +13,7 @@ import yaml
 from dateutil import tz
 from tabulate import tabulate
 
-from exceptions import BadParameter, DockerNotFound, StreamOutputError
+from exceptions import BadParameter, StreamOutputError
 from interpolation import interpolate_environment_variables
 
 
@@ -303,27 +303,18 @@ def load_stack_file(name, stackfile, stack=None):
     else:
         name = stack.name
 
-    if not stackfile:
-        filematch = 0
-        if os.path.exists("tutum.yml"):
-            stackfile = "tutum.yml"
-            filematch += 1
-        if os.path.exists("docker-compose.yml"):
-            stackfile = "docker-compose.yml"
-            filematch += 1
-        if filematch == 0:
-            raise BadParameter("Cannot find stack file. Are you in the right directory?")
-        elif filematch > 1:
-            raise BadParameter("More than one stack file was found in the path. "
-                               "Please specify which one you'd like to use with -f <filename>")
+    stackfile = get_stackfile_name(stackfile)
+
     with open(stackfile, 'r') as f:
         content = yaml.load(f.read())
-        interpolated_content = interpolate_environment_variables(content, 'service')
+        try:
+            interpolated_content = interpolate_environment_variables(content, 'service')
+        except:
+            raise BadParameter("Bad format of the stack file: %s" % stackfile)
 
         services = []
         if interpolated_content:
             for k, v in interpolated_content.items():
-                print ()
                 v.update({"name": k})
                 services.append(v)
 
@@ -338,6 +329,18 @@ def load_stack_file(name, stackfile, stack=None):
             raise BadParameter("Bad format of the stack file: %s" % stackfile)
 
     return stack
+
+
+def get_stackfile_name(stackfile):
+    if not stackfile:
+        stackfile_found = False
+        for stackfile in ["docker-cloud.yml", "tutum.yml", "docker-compose.yml"]:
+            if os.path.exists(stackfile):
+                stackfile_found = True
+                break
+        if not stackfile_found:
+            raise BadParameter("Cannot find stack file. Are you in the right directory?")
+    return stackfile
 
 
 def inject_env_var(services):
