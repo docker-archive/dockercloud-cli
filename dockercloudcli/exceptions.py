@@ -17,6 +17,7 @@ class StreamOutputError(Exception):
 class InternalError(RuntimeError):
     pass
 
+
 class ConfigurationError(Exception):
     def __init__(self, msg):
         self.msg = msg

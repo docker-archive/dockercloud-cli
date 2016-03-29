@@ -10,6 +10,7 @@ from string import Template
 import six
 
 from .exceptions import ConfigurationError
+
 log = logging.getLogger(__name__)
 
 
@@ -74,7 +75,7 @@ class BlankDefaultDict(dict):
             if key not in self.missing_keys:
                 log.warn(
                     "The {} variable is not set. Defaulting to a blank string."
-                    .format(key)
+                        .format(key)
                 )
                 self.missing_keys.append(key)
 

@@ -78,7 +78,7 @@ def service_ps(quiet, status, stack):
             s = dockercloud.Utils.fetch_remote_stack(stack, raise_exceptions=False)
             if isinstance(s, dockercloud.NonUniqueIdentifier):
                 raise dockercloud.NonUniqueIdentifier(
-                        "Identifier %s matches more than one stack, please use UUID instead" % stack)
+                    "Identifier %s matches more than one stack, please use UUID instead" % stack)
             if isinstance(s, dockercloud.ObjectNotFound):
                 raise dockercloud.ObjectNotFound("Identifier '%s' does not match any stack" % stack)
             stack_resource_uri = s.resource_uri
@@ -113,8 +113,8 @@ def service_ps(quiet, status, stack):
             utils.tabulate_result(data_list, headers)
             if has_unsynchronized_service:
                 print(
-                        "\n(*) Please note that this service needs to be redeployed to "
-                        "have its configuration changes applied")
+                    "\n(*) Please note that this service needs to be redeployed to "
+                    "have its configuration changes applied")
     except Exception as e:
         print(e, file=sys.stderr)
         sys.exit(EXCEPTION_EXIT_CODE)
@@ -599,7 +599,7 @@ def container_ps(quiet, status, service, no_trunc):
             s = dockercloud.Utils.fetch_remote_service(service, raise_exceptions=False)
             if isinstance(s, dockercloud.NonUniqueIdentifier):
                 raise dockercloud.NonUniqueIdentifier(
-                        "Identifier %s matches more than one service, please use UUID instead" % service)
+                    "Identifier %s matches more than one service, please use UUID instead" % service)
             if isinstance(s, dockercloud.ObjectNotFound):
                 raise dockercloud.ObjectNotFound("Identifier '%s' does not match any service" % service)
             service_resource_uri = s.resource_uri
@@ -928,9 +928,9 @@ def nodecluster_ls(quiet):
             region = nodecluster.region
             try:
                 node_type = dockercloud.NodeType.fetch(
-                        nodecluster.node_type.strip("/").split("api/infra/%s/nodetype/" % API_VERSION)[-1]).label
+                    nodecluster.node_type.strip("/").split("api/infra/%s/nodetype/" % API_VERSION)[-1]).label
                 region = dockercloud.Region.fetch(
-                        nodecluster.region.strip("/").split("api/infra/%s/region/" % API_VERSION)[-1]).label
+                    nodecluster.region.strip("/").split("api/infra/%s/region/" % API_VERSION)[-1]).label
             except Exception:
                 pass
 
@@ -1072,7 +1072,7 @@ def nodecluster_create(target_num_nodes, name, provider, region, nodetype, sync,
         nodecluster.save()
         result = nodecluster.deploy()
         if not utils.sync_action(nodecluster, sync):
-                has_exception = True
+            has_exception = True
         if result:
             print(nodecluster.uuid)
     except Exception as e:
@@ -1154,7 +1154,7 @@ def tag_add(identifiers, tags):
                         obj = dockercloud.Utils.fetch_remote_node(identifier)
                     except dockercloud.ObjectNotFound:
                         raise dockercloud.ObjectNotFound(
-                                "Identifier '%s' does not match any service, node or nodecluster" % identifier)
+                            "Identifier '%s' does not match any service, node or nodecluster" % identifier)
 
             tag = dockercloud.Tag.fetch(obj)
             tag.add(tags)
@@ -1182,7 +1182,7 @@ def tag_ls(identifiers, quiet):
                     obj = dockercloud.Utils.fetch_remote_node(identifier, raise_exceptions=False)
                     if isinstance(obj, dockercloud.ObjectNotFound):
                         raise dockercloud.ObjectNotFound(
-                                "Identifier '%s' does not match any service, node or nodecluster" % identifier)
+                            "Identifier '%s' does not match any service, node or nodecluster" % identifier)
                     else:
                         obj_type = 'Node'
                 else:
@@ -1229,7 +1229,7 @@ def tag_rm(identifiers, tags):
                         obj = dockercloud.Utils.fetch_remote_node(identifier)
                     except dockercloud.ObjectNotFound:
                         raise dockercloud.ObjectNotFound(
-                                "Identifier '%s' does not match any service, node or nodecluster" % identifier)
+                            "Identifier '%s' does not match any service, node or nodecluster" % identifier)
 
             tag = dockercloud.Tag.fetch(obj)
             for t in tags:
@@ -1260,7 +1260,7 @@ def tag_set(identifiers, tags):
                         obj = dockercloud.Utils.fetch_remote_node(identifier)
                     except dockercloud.ObjectNotFound:
                         raise dockercloud.ObjectNotFound(
-                                "Identifier '%s' does not match any service, node or nodecluster" % identifier)
+                            "Identifier '%s' does not match any service, node or nodecluster" % identifier)
 
             obj.tags = []
             for t in tags:
@@ -1336,10 +1336,10 @@ def trigger_rm(identifier, trigger_identifiers):
         sys.exit(EXCEPTION_EXIT_CODE)
 
 
-def stack_up(name, stackfile, sync):
+def stack_up(name, files, sync):
     has_exception = False
     try:
-        stack = utils.load_stack_file(name=name, stackfile=stackfile)
+        stack = utils.load_stackfiles(name=name, files=files)
         stack.save()
         result = stack.start()
         if not utils.sync_action(stack, sync):
@@ -1353,10 +1353,10 @@ def stack_up(name, stackfile, sync):
         sys.exit(EXCEPTION_EXIT_CODE)
 
 
-def stack_create(name, stackfile, sync):
+def stack_create(name, files, sync):
     has_exception = False
     try:
-        stack = utils.load_stack_file(name=name, stackfile=stackfile)
+        stack = utils.load_stackfiles(name=name, files=files)
         result = stack.save()
         if not utils.sync_action(stack, sync):
             has_exception = True
@@ -1477,10 +1477,10 @@ def stack_terminate(identifiers, sync):
         sys.exit(EXCEPTION_EXIT_CODE)
 
 
-def stack_update(identifier, stackfile, sync):
+def stack_update(identifier, files, sync):
     has_exception = False
     try:
-        stack = utils.load_stack_file(name=None, stackfile=stackfile,
+        stack = utils.load_stackfiles(name=None, files=files,
                                       stack=dockercloud.Utils.fetch_remote_stack(identifier))
         result = stack.save()
         if not utils.sync_action(stack, sync):
