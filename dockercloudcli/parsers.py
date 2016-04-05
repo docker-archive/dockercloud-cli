@@ -81,7 +81,7 @@ def add_up_parser(subparsers):
     up_parser = subparsers.add_parser('up', help='Create and deploy a stack',
                                       description='Create and deploy a stack')
     up_parser.add_argument('-n', '--name', help='The name of the stack, which wil be shown in Docker Cloud')
-    up_parser.add_argument('-f', '--file', help="the name of the Stackfile")
+    up_parser.add_argument('-f', '--file', help="the name of the Stackfile", action='append')
     up_parser.add_argument('--sync', help='block the command until the async operation has finished',
                            action='store_true')
 
@@ -713,7 +713,7 @@ def add_stack_parser(subparsers):
     create_parser = stack_subparser.add_parser('create', help='Create a new stack without deploying',
                                                description='Create a new stack without deploying')
     create_parser.add_argument('-n', '--name', help='The name of the stack, which wil be shown in Docker Cloud')
-    create_parser.add_argument('-f', '--file', help="the name of the Stackfile")
+    create_parser.add_argument('-f', '--file', help="the name of the Stackfile", action='append')
     create_parser.add_argument('--sync', help='block the command until the async operation has finished',
                                action='store_true')
 
@@ -763,13 +763,13 @@ def add_stack_parser(subparsers):
     up_parser = stack_subparser.add_parser('up', help='Create and deploy a stack',
                                            description='Create and deploy a stack')
     up_parser.add_argument('-n', '--name', help='The name of the stack, which will be shown in Docker Cloud')
-    up_parser.add_argument('-f', '--file', help="the name of the Stackfile")
+    up_parser.add_argument('-f', '--file', help="the name of the Stackfile", action='append')
     up_parser.add_argument('--sync', help='block the command until the async operation has finished',
                            action='store_true')
 
     # docker-cloud stack update
     update_parser = stack_subparser.add_parser('update', help='Update a stack', description='Update a stack')
     update_parser.add_argument('identifier', help="stack's UUID (either long or short) or name")
-    update_parser.add_argument('-f', '--file', help="the name of the Stackfile")
+    update_parser.add_argument('-f', '--file', help="the name of the Stackfile", action='append')
     update_parser.add_argument('--sync', help='block the command until the async operation has finished',
                                action='store_true')

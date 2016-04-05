@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import tempfile
 import unittest
 
 import mock
@@ -116,17 +117,119 @@ class ParseEnvironmentVariablesTestCase(unittest.TestCase):
         self.assertEqual(output, parse_envvars(['MYSQL_USER=admin', 'MYSQL_PASS=mypass'], []))
 
 
-class GetStackfileName(unittest.TestCase):
-    def test_get_stackfile_name_not_empty_name(self):
-        self.assertEqual("abc", get_stackfile_name("abc"))
+class GetStackNameTestCase(unittest.TestCase):
+    def test_update_stack_with_existing_stack(self):
+        stack = dockercloud.Stack.create()
+        self.assertEqual(stack, update_stack("whatever", stack))
 
-    @mock.patch('dockercloudcli.utils.os.path.exists')
-    def test_get_stackfile_name_empty_name(self, mock_exist):
-        mock_exist.side_effect = [False, False, False]
-        self.assertRaises(BadParameter, get_stackfile_name, "")
-        mock_exist.side_effect = [True, True, True]
-        self.assertEqual("docker-cloud.yml", get_stackfile_name(""))
-        mock_exist.side_effect = [False, True, True]
-        self.assertEqual("tutum.yml", get_stackfile_name(""))
-        mock_exist.side_effect = [False, False, True]
-        self.assertEqual("docker-compose.yml", get_stackfile_name(""))
+    def test_update_stack_with_empty_stack(self):
+        self.assertEqual("name", update_stack("name", None).name)
+
+    @mock.patch('os.path.basename', )
+    def test_update_stack_with_empty_stack(self, mock_basename):
+        mock_basename.return_value = "basename"
+        self.assertEqual("basename", update_stack(None, None).name)
+
+
+class GetServicesFromStackfilesTestCase(unittest.TestCase):
+    def test_get_services_from_stackfiles(self):
+        os.environ["DOCKER_HOST"] = "dockerhost"
+        os.environ["DOCKER_PATH"] = "dockerpath"
+        tempdir = tempfile.mkdtemp("sub")
+
+        self.assertEqual({'name': 'stackname', 'services': []}, get_services_from_stackfiles("stackname", []))
+
+        f1 = open(os.path.join(tempdir, 'docker-cloud.yml'), 'w')
+        f1.write('''lb:
+  image: dockercloud/haproxy
+  environment:
+    - DOCKER_HOST
+  volumes:
+    - $DOCKER_PATH:$DOCKER_PATH
+hw1:
+  image: dockercloud/hello-world
+  ''')
+        f1.close()
+        data1 = {'services': [{'environment': ['DOCKER_HOST=dockerhost'], 'image': 'dockercloud/haproxy', 'name': 'lb',
+                               'volumes': ['dockerpath:dockerpath']},
+                              {'image': 'dockercloud/hello-world', 'name': 'hw1'}],
+                 'name': 'stackname'}
+        self.assertEqual(data1, get_services_from_stackfiles("stackname", [os.path.join(tempdir, 'docker-cloud.yml')]))
+
+        f2 = open(os.path.join(tempdir, 'docker-cloud.override.yml'), 'w')
+        f2.write('''hw1:
+  image: tutum/hello-world
+hw2:
+  image: dockercloud/hello-world
+''')
+        f2.close()
+        data2 = {'services': [{'image': 'dockercloud/hello-world', 'name': 'hw2'},
+                              {'environment': ['DOCKER_HOST=dockerhost'], 'image': 'dockercloud/haproxy', 'name': 'lb',
+                               'volumes': ['dockerpath:dockerpath']},
+                              {'image': 'tutum/hello-world', 'name': 'hw1'}],
+                 'name': 'stackname'}
+        self.assertEqual(data2, get_services_from_stackfiles("stackname", [os.path.join(tempdir, 'docker-cloud.yml'),
+                                                                           os.path.join(tempdir,
+                                                                                        'docker-cloud.override.yml')]))
+
+
+class GetStackfilesTestCase(unittest.TestCase):
+    def test_get_stackfiles_with_a_list_of_files(self):
+        self.assertEqual(["file1", "file2", "file3"], get_stackfiles(["file1", "file2", "file3"]))
+
+    @mock.patch("os.getcwd")
+    def test_get_stackfiles_with_not_file_list(self, mock_getcwd):
+        tempdir = tempfile.mkdtemp("sub")
+        cwd = os.path.join(tempdir, "abc")
+        os.mkdir(cwd)
+        mock_getcwd.return_value = cwd
+
+        self.assertEqual([], get_stackfiles(None))
+
+        open(os.path.join(tempdir, "docker-compose.yaml"), "w").close()
+        self.assertEqual([os.path.join(tempdir, "docker-compose.yaml")], get_stackfiles(None))
+        open(os.path.join(tempdir, "docker-compose.override.yaml"), "w").close()
+        self.assertEqual(
+            [os.path.join(tempdir, "docker-compose.yaml"), os.path.join(tempdir, "docker-compose.override.yaml")],
+            get_stackfiles(None))
+        open(os.path.join(tempdir, "docker-compose.yml"), "w").close()
+        self.assertEqual([os.path.join(tempdir, "docker-compose.yml")], get_stackfiles(None))
+        open(os.path.join(tempdir, "docker-compose.override.yml"), "w").close()
+        self.assertEqual(
+            [os.path.join(tempdir, "docker-compose.yml"), os.path.join(tempdir, "docker-compose.override.yml")],
+            get_stackfiles(None))
+
+        open(os.path.join(tempdir, "tutum.yaml"), "w").close()
+        self.assertEqual([os.path.join(tempdir, "tutum.yaml")], get_stackfiles(None))
+        open(os.path.join(tempdir, "tutum.override.yaml"), "w").close()
+        self.assertEqual([os.path.join(tempdir, "tutum.yaml"), os.path.join(tempdir, "tutum.override.yaml")],
+                         get_stackfiles(None))
+        open(os.path.join(tempdir, "tutum.yml"), "w").close()
+        self.assertEqual([os.path.join(tempdir, "tutum.yml")], get_stackfiles(None))
+        open(os.path.join(tempdir, "tutum.override.yml"), "w").close()
+        self.assertEqual([os.path.join(tempdir, "tutum.yml"), os.path.join(tempdir, "tutum.override.yml")],
+                         get_stackfiles(None))
+
+        open(os.path.join(tempdir, "docker-cloud.yaml"), "w").close()
+        self.assertEqual([os.path.join(tempdir, "docker-cloud.yaml")], get_stackfiles(None))
+        open(os.path.join(tempdir, "docker-cloud.override.yaml"), "w").close()
+        self.assertEqual(
+            [os.path.join(tempdir, "docker-cloud.yaml"), os.path.join(tempdir, "docker-cloud.override.yaml")],
+            get_stackfiles(None))
+        open(os.path.join(tempdir, "docker-cloud.yml"), "w").close()
+        self.assertEqual([os.path.join(tempdir, "docker-cloud.yml")], get_stackfiles(None))
+        open(os.path.join(tempdir, "docker-cloud.override.yml"), "w").close()
+        self.assertEqual(
+            [os.path.join(tempdir, "docker-cloud.yml"), os.path.join(tempdir, "docker-cloud.override.yml")],
+            get_stackfiles(None))
+
+        open(os.path.join(cwd, "docker-compose.yaml"), "w").close()
+        self.assertEqual([os.path.join(cwd, "docker-compose.yaml")], get_stackfiles(None))
+        open(os.path.join(cwd, "docker-compose.override.yaml"), "w").close()
+        self.assertEqual([os.path.join(cwd, "docker-compose.yaml"), os.path.join(cwd, "docker-compose.override.yaml")],
+                         get_stackfiles(None))
+        open(os.path.join(cwd, "docker-compose.yml"), "w").close()
+        self.assertEqual([os.path.join(cwd, "docker-compose.yml")], get_stackfiles(None))
+        open(os.path.join(cwd, "docker-compose.override.yml"), "w").close()
+        self.assertEqual([os.path.join(cwd, "docker-compose.yml"), os.path.join(cwd, "docker-compose.override.yml")],
+                         get_stackfiles(None))
