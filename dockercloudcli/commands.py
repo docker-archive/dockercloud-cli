@@ -11,6 +11,7 @@ import dockercloud
 import websocket
 import yaml
 
+
 from dockercloudcli import utils
 
 AUTH_ERROR_EXIT_CODE = 2
@@ -39,7 +40,9 @@ def event():
         events.run_forever()
     except KeyboardInterrupt:
         pass
-
+    except dockercloud.AuthError as e:
+        print(e, file=sys.stderr)
+        sys.exit(AUTH_ERROR_EXIT_CODE)
 
 def service_inspect(identifiers):
     has_exception = False
