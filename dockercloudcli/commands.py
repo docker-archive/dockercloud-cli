@@ -289,7 +289,7 @@ def service_set(identifiers, image, cpu_shares, memory, privileged, target_num_c
                     service.cpu_shares = cpu_shares
                 if memory:
                     service.memory = memory
-                if privileged:
+                if privileged is not None:
                     service.privileged = privileged
                 if target_num_containers:
                     service.target_num_containers = target_num_containers
@@ -334,13 +334,13 @@ def service_set(identifiers, image, cpu_shares, memory, privileged, target_num_c
                 if autodestroy:
                     service.autodestroy = autodestroy
 
-                if autoredeploy:
+                if autoredeploy is not None:
                     service.autoredeploy = autoredeploy
 
                 if roles:
                     service.roles = roles
 
-                if sequential:
+                if sequential is not None:
                     service.sequential_deployment = sequential
 
                 bindings = utils.parse_volume(volume)
