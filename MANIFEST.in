@@ -1,4 +1,5 @@
 include Dockerfile
 include LICENSE
 include requirements.txt
+include test-requirements.txt
 include README.md

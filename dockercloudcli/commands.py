@@ -44,6 +44,7 @@ def event():
         print(e, file=sys.stderr)
         sys.exit(AUTH_ERROR_EXIT_CODE)
 
+
 def service_inspect(identifiers):
     has_exception = False
     for identifier in identifiers:
