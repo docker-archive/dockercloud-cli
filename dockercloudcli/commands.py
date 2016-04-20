@@ -34,9 +34,15 @@ Alternatively, you can set the following environment variables:
 
 
 def event():
+    def on_error(e):
+        print(e)
+        if isinstance(e, KeyboardInterrupt):
+            exit(0)
+
     try:
         events = dockercloud.Events()
-        events.on_message(lambda e: print(e))
+        events.on_error(on_error)
+        events.on_message(lambda m: print(m))
         events.run_forever()
     except KeyboardInterrupt:
         pass
