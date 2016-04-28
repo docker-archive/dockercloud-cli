@@ -80,7 +80,7 @@ def add_up_parser(subparsers):
     # docker-cloud up
     up_parser = subparsers.add_parser('up', help='Create and deploy a stack',
                                       description='Create and deploy a stack')
-    up_parser.add_argument('-n', '--name', help='The name of the stack, which wil be shown in Docker Cloud')
+    up_parser.add_argument('-n', '--name', help='The name of the stack, which will be shown in Docker Cloud')
     up_parser.add_argument('-f', '--file', help="the name of the Stackfile", action='append')
     up_parser.add_argument('--sync', help='block the command until the async operation has finished',
                            action='store_true')
