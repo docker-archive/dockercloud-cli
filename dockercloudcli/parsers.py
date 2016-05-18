@@ -129,9 +129,6 @@ def add_action_parser(subparsers):
 
 
 def add_service_parser(subparsers):
-    def str2bool(v):
-        return v.lower() in ("yes", "true", "t", "1", "y")
-
     # docker-cloud service
     service_parser = subparsers.add_parser('service', help='Service-related operations',
                                            description='Service-related operations')
@@ -363,12 +360,15 @@ def add_service_parser(subparsers):
     set_parser = service_subparser.add_parser('set', help='Change and replace the existing service properties',
                                               description='Change service properties.'
                                                           ' This command REPLACES the existing properties.')
-    set_parser.register('type', 'bool', str2bool)
     set_parser.add_argument('identifier', help="service's UUID (either long or short) or name[.stack_name]", nargs='+')
     set_parser.add_argument('--image', help='the name of the image used to deploy this service')
     set_parser.add_argument('--cpushares', help='Relative weight for CPU Shares', type=int)
     set_parser.add_argument('--memory', help='RAM memory hard limit in MB', type=int)
-    set_parser.add_argument('--privileged', help='Give extended privileges to this container <true/false>', type='bool')
+    set_parser.add_argument('--privileged', help='Give extended privileges to this container',
+                            dest='privileged', action='store_true')
+    set_parser.add_argument('--no-privileged', help='Reclaim extended privileges from this container',
+                            dest='privileged', action='store_false')
+    set_parser.set_defaults(privileged=None)
     set_parser.add_argument('-t', '--target-num-containers',
                             help='the number of containers to run for this service', type=int)
     set_parser.add_argument('-r', '--run-command',
@@ -394,15 +394,22 @@ def add_service_parser(subparsers):
     set_parser.add_argument('--autodestroy', help='whether the containers should be terminated if '
                                                   'they stop (default: OFF)',
                             choices=['OFF', 'ON_SUCCESS', 'ALWAYS'])
-    set_parser.add_argument('--autoredeploy', help="whether the containers should be auto redeployed.",
-                            action='store_true')
+    set_parser.add_argument('--autoredeploy', help="set the containers to be auto redeployed",
+                            dest='autoredeploy', action='store_true')
+    set_parser.add_argument('--no-autoredeploy', help="set the containers not to be auto redeployed",
+                            dest='autoredeploy', action='store_false')
+    set_parser.set_defaults(autoredeploy=None)
     set_parser.add_argument('--autorestart', help='whether the containers should be restarted if they stop '
                                                   '(default: OFF)', choices=['OFF', 'ON_FAILURE', 'ALWAYS'])
     set_parser.add_argument('--role', help='Docker Cloud API roles to grant the service, '
                                            'i.e. "global" (default: none, possible values: "global")', action='append')
     set_parser.add_argument('--sequential',
-                            help='whether the containers should be launched and scaled sequentially<true/false>',
-                            type='bool')
+                            help='set the containers to be launched and scaled sequentially',
+                            dest='sequential', action='store_true')
+    set_parser.add_argument('--no-sequential',
+                            help='set the containers not to be launched and scaled sequentially',
+                            dest='sequential', action='store_false')
+    set_parser.set_defaults(sequential=None)
     set_parser.add_argument('--redeploy', help="redeploy service with new configuration after set command",
                             action='store_true')
     set_parser.add_argument('-v', '--volume', help='Bind mount a volume (e.g., from the host: -v /host:/container, '

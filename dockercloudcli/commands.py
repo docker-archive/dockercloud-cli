@@ -11,6 +11,7 @@ import dockercloud
 import websocket
 import yaml
 
+
 from dockercloudcli import utils
 
 AUTH_ERROR_EXIT_CODE = 2
@@ -33,12 +34,21 @@ Alternatively, you can set the following environment variables:
 
 
 def event():
+    def on_error(e):
+        print(e, file=sys.stderr)
+        if isinstance(e, KeyboardInterrupt):
+            exit(0)
+
     try:
         events = dockercloud.Events()
-        events.on_message(lambda e: print(e))
+        events.on_error(on_error)
+        events.on_message(lambda m: print(m))
         events.run_forever()
     except KeyboardInterrupt:
         pass
+    except dockercloud.AuthError as e:
+        print(e, file=sys.stderr)
+        sys.exit(AUTH_ERROR_EXIT_CODE)
 
 
 def service_inspect(identifiers):
@@ -279,7 +289,7 @@ def service_set(identifiers, image, cpu_shares, memory, privileged, target_num_c
                     service.cpu_shares = cpu_shares
                 if memory:
                     service.memory = memory
-                if privileged:
+                if privileged is not None:
                     service.privileged = privileged
                 if target_num_containers:
                     service.target_num_containers = target_num_containers
@@ -324,13 +334,13 @@ def service_set(identifiers, image, cpu_shares, memory, privileged, target_num_c
                 if autodestroy:
                     service.autodestroy = autodestroy
 
-                if autoredeploy:
+                if autoredeploy is not None:
                     service.autoredeploy = autoredeploy
 
                 if roles:
                     service.roles = roles
 
-                if sequential:
+                if sequential is not None:
                     service.sequential_deployment = sequential
 
                 bindings = utils.parse_volume(volume)

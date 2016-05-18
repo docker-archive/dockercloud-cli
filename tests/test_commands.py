@@ -361,7 +361,7 @@ class ServiceSetTestCase(unittest.TestCase):
         mock_fetch_remote_service.return_value = service
         service_set([service.uuid], 'imagename', 1, '256M', True, 3, '-d', '/bin/mysql',
                     exposed_ports, published_ports, container_envvars, [], '', linked_to_service,
-                    'OFF', 'OFF', 'OFF', 'poweruser', True, False, None, None, None, False, "host", "host")
+                    'OFF', 'OFF', False, 'poweruser', True, False, None, None, None, False, "host", "host")
 
         mock_save.assert_called()
         self.assertEqual('7A4CFE51-03BB-42D6-825E-3B533888D8CD\n'
@@ -379,7 +379,7 @@ class ServiceSetTestCase(unittest.TestCase):
         self.assertEqual(utils.parse_links(linked_to_service, 'to_service'), service.linked_to_service)
         self.assertEqual('OFF', service.autorestart)
         self.assertEqual('OFF', service.autodestroy)
-        self.assertEqual('OFF', service.autoredeploy)
+        self.assertEqual(False, service.autoredeploy)
         self.assertEqual('poweruser', service.roles)
         self.assertEqual(True, service.sequential_deployment)
         self.assertEqual("host", service.net)
