@@ -35,7 +35,7 @@ Alternatively, you can set the following environment variables:
 
 def event():
     def on_error(e):
-        print(e)
+        print(e, file=sys.stderr)
         if isinstance(e, KeyboardInterrupt):
             exit(0)
 
