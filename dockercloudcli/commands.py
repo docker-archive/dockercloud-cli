@@ -536,7 +536,10 @@ def container_exec(identifier, command):
         print(e, file=sys.stderr)
         sys.exit(EXCEPTION_EXIT_CODE)
 
-    endpoint = "api/app/%s/container/%s/exec/?" % (API_VERSION, container.uuid)
+    if dockercloud.namespace:
+        endpoint = "api/app/%s/%s/container/%s/exec/?" % (API_VERSION, dockercloud.namespace, container.uuid)
+    else:
+        endpoint = "api/app/%s/container/%s/exec/?" % (API_VERSION, container.uuid)
 
     if command:
         escaped_cmd = []
