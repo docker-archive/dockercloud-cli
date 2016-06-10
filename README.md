@@ -89,3 +89,19 @@ _Note: docker-cloud CLI and python-dockercloud will pick up the auth in the foll
 * DOCKERCLOUD_USER, DOCKERCLOUD_APIKEY
 * DOCKERCLOUD_USER, DOCKERCLOUD_PASS
 * ~/.docker/config.json
+
+
+## Namespace
+
+To use teams and orgs, you need to set "DOCKERCLOUD_NAMESPACE=yourteam". After that, all the docker-cloud commands will be executed in the specified namespace.
+
+For example:
+
+        export DOCKERCLOUD_NAMESPACE=yourteam
+        docker-cloud container ps
+        docker-cloud service ps
+
+You can also set the environment variable before each command:
+
+        DOCKERCLOUD_NAMESPACE=yourteam docker container ps
+        DOCKERCLOUD_NAMESPACE=youracc  docker container ps
