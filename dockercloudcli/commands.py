@@ -911,7 +911,11 @@ def node_upgrade(identifiers, sync):
 def node_byo():
     token = ""
     try:
-        json = dockercloud.api.http.send_request("POST", "api/infra/%s/token" % API_VERSION)
+        if dockercloud.namespace:
+            json = dockercloud.api.http.send_request("POST", "api/infra/%s/%s/token" %
+                                                     (API_VERSION, dockercloud.namespace))
+        else:
+            json = dockercloud.api.http.send_request("POST", "api/infra/%s/token" % API_VERSION)
         if json:
             token = json.get("token", "")
     except Exception as e:
