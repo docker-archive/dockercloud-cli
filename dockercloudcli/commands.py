@@ -536,7 +536,10 @@ def container_exec(identifier, command):
         print(e, file=sys.stderr)
         sys.exit(EXCEPTION_EXIT_CODE)
 
-    endpoint = "api/app/%s/container/%s/exec/?" % (API_VERSION, container.uuid)
+    if dockercloud.namespace:
+        endpoint = "api/app/%s/%s/container/%s/exec/?" % (API_VERSION, dockercloud.namespace, container.uuid)
+    else:
+        endpoint = "api/app/%s/container/%s/exec/?" % (API_VERSION, container.uuid)
 
     if command:
         escaped_cmd = []
@@ -908,7 +911,11 @@ def node_upgrade(identifiers, sync):
 def node_byo():
     token = ""
     try:
-        json = dockercloud.api.http.send_request("POST", "api/infra/%s/token" % API_VERSION)
+        if dockercloud.namespace:
+            json = dockercloud.api.http.send_request("POST", "api/infra/%s/%s/token" %
+                                                     (API_VERSION, dockercloud.namespace))
+        else:
+            json = dockercloud.api.http.send_request("POST", "api/infra/%s/token" % API_VERSION)
         if json:
             token = json.get("token", "")
     except Exception as e:
