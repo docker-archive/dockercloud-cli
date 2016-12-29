@@ -1417,14 +1417,6 @@ class NodeClusterShowTypesTestCase(unittest.TestCase):
         self.buf.truncate(0)
 
     @mock.patch('dockercloudcli.commands.dockercloud.NodeType.list')
-    def test_nodecluster_show_types_with_region_filter(self, mock_list):
-        output = '''NAME    LABEL    PROVIDER      REGIONS
-512mb   512MB    digitalocean  ams1, sfo1, nyc2, ams2, sgp1, lon1, nyc3, nyc1
-1gb     1GB      digitalocean  ams1, sfo1, nyc2, ams2, sgp1, lon1, nyc3, nyc1'''
-        mock_list.return_value = self.nodetypelist
-        nodecluster_show_types(output, 'nyc3')
-
-    @mock.patch('dockercloudcli.commands.dockercloud.NodeType.list')
     def test_nodecluster_show_types_with_filters(self, mock_list):
         mock_list.return_value = self.nodetypelist
         nodecluster_show_types('aws', 'nyc3')
@@ -1473,3 +1465,123 @@ class NodeClusterCreateTestCase(unittest.TestCase):
         nodecluster_create(3, 'name', 'provider', 'region', 'nodetype', False, None, None, "", [], [], "")
 
         mock_exit.assert_called_with(EXCEPTION_EXIT_CODE)
+
+
+class SwarmListTestCase(unittest.TestCase):
+    def setUp(self):
+        self.stdout = sys.stdout
+        sys.stdout = self.buf = StringIO.StringIO()
+
+        swarm1 = dockercloudcli.commands.dockercloud.Swarm()
+        swarm1.name = "53kaclovs67uw4u6r53ekjd79"
+        swarm1.namespace = "tifayuki"
+        swarm1.swarm_id = "53kaclovs67uw4u6r53ekjd79"
+        swarm1.state = "Unavailable"
+        swarm1.public_endpoint = "53kaclovs67uw4u6r53ekjd79.tifayuki.docker.cloud"
+
+        swarm2 = dockercloudcli.commands.dockercloud.Swarm()
+        swarm2.name = "p4mx9lunhllmn92xc9admt6me"
+        swarm2.namespace = "tifayuki"
+        swarm2.swarm_id = "p4mx9lunhllmn92xc9admt6me"
+        swarm2.state = "Unavailable"
+        swarm2.public_endpoint = "p4mx9lunhllmn92xc9admt6me.tifayuki.docker.cloud"
+        self.swarmList = [swarm1, swarm2]
+
+    def tearDown(self):
+        sys.stdout = self.stdout
+
+    @mock.patch('dockercloudcli.commands.dockercloud.Swarm.list')
+    def test_swarm_ls(self, mock_list):
+        output = u'''SWARM_ID                   NAME                                STATUS       ENDPOINT
+53kaclovs67uw4u6r53ekjd79  tifayuki/53kaclovs67uw4u6r53ekjd79  Unavailable  53kaclovs67uw4u6r53ekjd79.tifayuki.docker.cloud
+p4mx9lunhllmn92xc9admt6me  tifayuki/p4mx9lunhllmn92xc9admt6me  Unavailable  p4mx9lunhllmn92xc9admt6me.tifayuki.docker.cloud'''
+        mock_list.return_value = self.swarmList
+        swarm_ls('', False)
+
+        mock_list.assert_called_with(namespace='')
+        self.assertEqual(output, self.buf.getvalue().strip())
+        self.buf.truncate(0)
+
+    @mock.patch('dockercloudcli.commands.dockercloud.Swarm.list')
+    def test_swarm_ls_quiet(self, mock_list):
+        output = u'''53kaclovs67uw4u6r53ekjd79
+p4mx9lunhllmn92xc9admt6me'''
+        mock_list.return_value = self.swarmList
+        swarm_ls('', True)
+
+        mock_list.assert_called_with(namespace='')
+        self.assertEqual(output, self.buf.getvalue().strip())
+        self.buf.truncate(0)
+
+
+class SwarmRmTestCase(unittest.TestCase):
+    def setUp(self):
+        self.stdout = sys.stdout
+        sys.stdout = self.buf = StringIO.StringIO()
+
+    def tearDown(self):
+        sys.stdout = self.stdout
+
+    @mock.patch('dockercloudcli.commands.dockercloud.Swarm.delete')
+    @mock.patch('dockercloudcli.commands.dockercloud.Utils.fetch_remote_swarm')
+    def test_swarm_remove(self, mock_fetch_remote_swarm, mock_delete):
+        swarm = dockercloudcli.commands.dockercloud.Swarm()
+        swarm.swarm_id = 'p4mx9lunhllmn92xc9admt6me'
+        mock_fetch_remote_swarm.return_value = swarm
+        mock_delete.return_value = True
+        swarm_rm(['p4mx9lunhllmn92xc9admt6me'], False)
+
+        self.assertEqual(swarm.swarm_id, self.buf.getvalue().strip())
+        self.buf.truncate(0)
+
+    @mock.patch('dockercloudcli.commands.sys.exit')
+    @mock.patch('dockercloudcli.commands.dockercloud.Utils.fetch_remote_swarm', side_effect=dockercloud.ApiError)
+    def test_swarm_remove_with_exception(self, mock_fetch_remote_swarm, mock_exit):
+        service_terminate(['p4mx9lunhllmn92xc9admt6me'], False)
+        mock_exit.assert_called_with(EXCEPTION_EXIT_CODE)
+
+
+class SwarmInspectTestCase(unittest.TestCase):
+    def setUp(self):
+        self.stdout = sys.stdout
+        sys.stdout = self.buf = StringIO.StringIO()
+
+        swarm = dockercloudcli.commands.dockercloud.Swarm()
+        swarm.internal_endpoint = None
+        swarm.name = "53kaclovs67uw4u6r53ekjd79"
+        swarm.namespace = "tifayuki"
+        swarm.swarm_id = "53kaclovs67uw4u6r53ekjd79"
+        swarm.state = "Unavailable"
+        swarm.version = "1.24"
+        swarm.public_endpoint = "53kaclovs67uw4u6r53ekjd79.tifayuki.docker.cloud"
+        swarm.client_id = "a2a894ff-3d37-4205-b3f6-a83f24864531"
+        swarm.client_secret = "74b3432f-1412-4270-b4ab-08b9965e1fe4"
+        swarm.nickname = "53kaclovs67uw4u6r53ekjd79"
+        swarm.dockercloud_action_uri = ""
+        swarm.resource_uri = "/api/infra/v1/tifayuki/swarm/53kaclovs67uw4u6r53ekjd79/"
+        self.swarm = swarm
+
+    def tearDown(self):
+        sys.stdout = self.stdout
+
+    @mock.patch('dockercloudcli.commands.dockercloud.Utils.fetch_remote_swarm')
+    def test_swarm_inspect(self, mock_fetch_remote_swarm):
+        output = '''{
+  "internal_endpoint": null,
+  "name": "53kaclovs67uw4u6r53ekjd79",
+  "namespace": "tifayuki",
+  "swarm_id": "53kaclovs67uw4u6r53ekjd79",
+  "state": "Unavailable",
+  "version": "1.24",
+  "client_id": "a2a894ff-3d37-4205-b3f6-a83f24864531",
+  "client_secret": "74b3432f-1412-4270-b4ab-08b9965e1fe4",
+  "public_endpoint": "53kaclovs67uw4u6r53ekjd79.tifayuki.docker.cloud",
+  "nickname": "53kaclovs67uw4u6r53ekjd79",
+  "dockercloud_action_uri": "",
+  "resource_uri": "/api/infra/v1/tifayuki/swarm/53kaclovs67uw4u6r53ekjd79/"
+}'''
+        mock_fetch_remote_swarm.return_value = self.swarm
+        swarm_inspect(['53kaclovs67uw4u6r53ekjd79'])
+
+        self.assertEqual(' '.join(output.split()), ' '.join(self.buf.getvalue().strip().split()))
+        self.buf.truncate(0)

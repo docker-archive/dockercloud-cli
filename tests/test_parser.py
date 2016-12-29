@@ -51,6 +51,8 @@ class PatchHelpOptionTestCase(unittest.TestCase):
             ['docker-cloud', 'tag', 'ls'],
             ['docker-cloud', 'tag', 'rm'],
             ['docker-cloud', 'tag', 'set'],
+            ['docker-cloud', 'swarm', 'inspect'],
+            ['docker-cloud', 'swarm', 'rm'],
         ]
         self.not_add_help_argv_list = [
             ["docker-cloud", "service", "ps"],
@@ -62,6 +64,8 @@ class PatchHelpOptionTestCase(unittest.TestCase):
             ["docker-cloud", "nodecluster", "region"],
             ['docker-cloud', 'nodecluster', 'nodetype'],
             ["docker-cloud", "container", "run", "-p", "80:80", "tutum/wordpress"],
+            ['docker-cloud', 'swarm', 'ls'],
+            ['docker-cloud', 'swarm', 'byo'],
         ]
 
     def test_parser_with_empty_args(self):
@@ -404,6 +408,24 @@ class CommandsDispatchTestCase(unittest.TestCase):
         args = self.parser.parse_args(['stack', 'export', 'id'])
         dispatch_cmds(args)
         mock_cmds.stack_export.assert_called_with(args.identifier, args.file)
+
+    @mock.patch('dockercloudcli.cli.commands')
+    def test_swarm_dispatch(self, mock_cmds):
+        args = self.parser.parse_args(['swarm', 'ls'])
+        dispatch_cmds(args)
+        mock_cmds.swarm_ls.assert_called_with(args.namespace, args.quiet)
+
+        args = self.parser.parse_args(['swarm', 'byo'])
+        dispatch_cmds(args)
+        mock_cmds.swarm_byo.assert_called_with()
+
+        args = self.parser.parse_args(['swarm', 'rm', 'id'])
+        dispatch_cmds(args)
+        mock_cmds.swarm_rm.assert_called_with(args.identifier, args.sync)
+
+        args = self.parser.parse_args(['swarm', 'inspect', 'id'])
+        dispatch_cmds(args)
+        mock_cmds.swarm_inspect.assert_called_with(args.identifier)
 
 
 class ParserTestCase(unittest.TestCase):

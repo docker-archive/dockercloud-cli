@@ -568,7 +568,7 @@ def add_node_parser(subparsers):
     list_parser.add_argument('-q', '--quiet', help='Print only node uuid', action='store_true')
 
     # docker-cloud node rm
-    rm_parser = node_subparser.add_parser('rm', help='Remove a node', description='Remove a container')
+    rm_parser = node_subparser.add_parser('rm', help='Remove a node', description='Remove a Node')
     rm_parser.add_argument('identifier', help="Node's UUID (either long or short)", nargs='+')
     rm_parser.add_argument('--sync', help='Block the command until the async operation has finished',
                            action='store_true')
@@ -780,3 +780,30 @@ def add_stack_parser(subparsers):
     update_parser.add_argument('-f', '--file', help="The name of the Stackfile", action='append')
     update_parser.add_argument('--sync', help='Block the command until the async operation has finished',
                                action='store_true')
+
+
+def add_swarm_parser(subparsers):
+    # docker-cloud swarm
+    swarm_parser = subparsers.add_parser('swarm', help='Swarm-related operations',
+                                         description='Swarm-related operations')
+    swarm_subparser = swarm_parser.add_subparsers(title='Docker Cloud Swarm commands', dest='subcmd')
+
+    # docker-cloud swarm byo
+    swarm_subparser.add_parser('byo', help='Instructions on how to Bring Your Own Swarm cluster to Docker Cloud',
+                               description='Instructions on how to Bring Your Own Swarm cluster to Docker Cloud')
+
+    # docker-cloud swarm inspect
+    inspect_parser = swarm_subparser.add_parser('inspect', help='Inspect a Swarm cluster',
+                                                description='Inspect a Swarm cluster')
+    inspect_parser.add_argument('identifier', help="Swarm cluster's <swarm_id> or [namespace/]<name>", nargs='+')
+
+    # docker-cloud swarm ls
+    list_parser = swarm_subparser.add_parser('ls', help='List Swarm clusters', description='List Swarm clusters')
+    list_parser.add_argument('-q', '--quiet', help='print only Swarm id', action='store_true')
+    list_parser.add_argument('-n', '--namespace', help='list swarm clusters under the under the namespace')
+
+    # docker-cloud swarm rm
+    rm_parser = swarm_subparser.add_parser('rm', help='Remove a Swarm', description='Remove a Swarm')
+    rm_parser.add_argument('identifier', help="Swarm cluster's <id> or [namespace/]<name>", nargs='+')
+    rm_parser.add_argument('--sync', help='block the command until the async operation has finished',
+                           action='store_true')

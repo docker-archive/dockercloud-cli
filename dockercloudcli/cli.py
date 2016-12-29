@@ -39,6 +39,7 @@ def initialize_parser():
     parsers.add_run_parser(subparsers)
     parsers.add_service_parser(subparsers)
     parsers.add_stack_parser(subparsers)
+    parsers.add_swarm_parser(subparsers)
     parsers.add_tag_parser(subparsers)
     parsers.add_trigger_parser(subparsers)
     parsers.add_up_parser(subparsers)
@@ -58,7 +59,7 @@ def patch_help_option(argv=sys.argv):
     if len(args) == 1:
         args.append('-h')
     elif len(args) == 2 and args[1] in ['action', 'service', 'container', 'repository', 'exec', 'node',
-                                        'nodecluster', 'tag', 'trigger', 'stack', 'push', 'run']:
+                                        'nodecluster', 'tag', 'trigger', 'stack', 'push', 'run', 'swarm']:
         args.append('-h')
     elif len(args) == 3:
         if args[1] == 'action' and args[2] in ['inspect', 'logs', 'cancel', 'retry']:
@@ -81,6 +82,8 @@ def patch_help_option(argv=sys.argv):
             args.append('-h')
         elif args[1] == 'stack' and args[2] in ['inspect', 'redeploy', 'terminate', 'start', 'stop', 'update',
                                                 'export']:
+            args.append('-h')
+        elif args[1] == 'swarm' and args[2] in ['inspect', 'rm']:
             args.append('-h')
     elif len(args) == 4:
         if args[1] == 'service' and args[2] == 'env':
@@ -290,6 +293,15 @@ def dispatch_cmds(args):
             commands.stack_update(args.identifier, args.file, args.sync)
         elif args.subcmd == 'export':
             commands.stack_export(args.identifier, args.file)
+    elif args.cmd == 'swarm':
+        if args.subcmd == 'inspect':
+            commands.swarm_inspect(args.identifier)
+        elif args.subcmd == 'ls':
+            commands.swarm_ls(args.namespace, args.quiet)
+        elif args.subcmd == 'rm':
+            commands.swarm_rm(args.identifier, args.sync)
+        elif args.subcmd == 'byo':
+            commands.swarm_byo()
     elif args.cmd == 'up':
         commands.stack_up(args.name, args.file, args.sync)
 

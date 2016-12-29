@@ -11,7 +11,6 @@ import dockercloud
 import websocket
 import yaml
 
-
 from dockercloudcli import utils
 
 AUTH_ERROR_EXIT_CODE = 2
@@ -1820,3 +1819,64 @@ def service_env_update(identifiers, envvars, envfiles, redeploy, sync):
             has_exception = True
     if has_exception:
         sys.exit(EXCEPTION_EXIT_CODE)
+
+
+def swarm_ls(namespace, quiet):
+    try:
+        headers = ["SWARM_ID", "NAME", "STATUS", "ENDPOINT", "DOCKER_VER"]
+        swarm_list = dockercloud.Swarm.list(namespace=namespace)
+        data_list = []
+        long_uuid_list = []
+        for swarm in swarm_list:
+            data_list.append([swarm.swarm_id, "/".join([swarm.namespace, swarm.name]),
+                              swarm.state, swarm.public_endpoint])
+            long_uuid_list.append(swarm.swarm_id)
+        if len(data_list) == 0:
+            data_list.append(["", "", "", "", "", ""])
+        if quiet:
+            for uuid in long_uuid_list:
+                print(uuid)
+        else:
+            utils.tabulate_result(data_list, headers)
+    except Exception as e:
+        print(e, file=sys.stderr)
+        sys.exit(EXCEPTION_EXIT_CODE)
+
+
+def swarm_inspect(identifiers):
+    has_exception = False
+    for identifier in identifiers:
+        try:
+            swarm = dockercloud.Utils.fetch_remote_swarm(identifier)
+            print(json.dumps(swarm.get_all_attributes(), indent=2))
+        except Exception as e:
+            print(e, file=sys.stderr)
+            has_exception = True
+    if has_exception:
+        sys.exit(EXCEPTION_EXIT_CODE)
+
+
+def swarm_rm(identifiers, sync):
+    has_exception = False
+    for identifier in identifiers:
+        try:
+            swarm = dockercloud.Utils.fetch_remote_swarm(identifier)
+            result = swarm.delete()
+            if not utils.sync_action(swarm, sync):
+                has_exception = True
+            if result:
+                print(swarm.swarm_id)
+        except Exception as e:
+            print(e, file=sys.stderr)
+            has_exception = True
+    if has_exception:
+        sys.exit(EXCEPTION_EXIT_CODE)
+
+
+def swarm_byo():
+    print("Docker Cloud lets you register your own Swarm cluster. "
+          "In order to do this, you have to run the Docker Cloud registration container.")
+    print("Run the following command in a manager node of your Swarm:")
+    print()
+    print("\tdocker run -ti --rm -v /var/run/docker.sock:/var/run/docker.sock dockercloud/registration")
+    print()
