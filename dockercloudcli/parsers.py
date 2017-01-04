@@ -804,6 +804,12 @@ def add_swarm_parser(subparsers):
 
     # docker-cloud swarm rm
     rm_parser = swarm_subparser.add_parser('rm', help='Remove a Swarm', description='Remove a Swarm')
-    rm_parser.add_argument('identifier', help="<Swarm cluster's ID> or [namespace/]<name>", nargs='+')
+    rm_parser.add_argument('identifier', help="Swarm cluster's <Swarm ID> or [namespace/]<name>", nargs='+')
     rm_parser.add_argument('--sync', help='Block the command until the async operation has finished',
                            action='store_true')
+
+    # docker-cloud swarm update
+    update_parser = swarm_subparser.add_parser('update', help='Update a Swarm cluster information',
+                                               description='Update a Swarm cluster information')
+    update_parser.add_argument('identifier', help="Swarm cluster's <Swarm ID> or [namespace/]<name>", nargs='+')
+    update_parser.add_argument('--internal-endpoint', help='The internal endpoint of the Swarm cluster')

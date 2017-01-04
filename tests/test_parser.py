@@ -53,6 +53,7 @@ class PatchHelpOptionTestCase(unittest.TestCase):
             ['docker-cloud', 'tag', 'set'],
             ['docker-cloud', 'swarm', 'inspect'],
             ['docker-cloud', 'swarm', 'rm'],
+            ['docker-cloud', 'swarm', 'update'],
         ]
         self.not_add_help_argv_list = [
             ["docker-cloud", "service", "ps"],
@@ -426,6 +427,10 @@ class CommandsDispatchTestCase(unittest.TestCase):
         args = self.parser.parse_args(['swarm', 'inspect', 'id'])
         dispatch_cmds(args)
         mock_cmds.swarm_inspect.assert_called_with(args.identifier)
+
+        args = self.parser.parse_args(['swarm', 'update', 'id'])
+        dispatch_cmds(args)
+        mock_cmds.swarm_update.assert_called_with(args.identifier, args.internal_endpoint)
 
 
 class ParserTestCase(unittest.TestCase):

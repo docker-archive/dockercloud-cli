@@ -1873,6 +1873,22 @@ def swarm_rm(identifiers, sync):
         sys.exit(EXCEPTION_EXIT_CODE)
 
 
+def swarm_update(identifiers, internal_endpoint):
+    has_exception = False
+    for identifier in identifiers:
+        try:
+            swarm = dockercloud.Utils.fetch_remote_swarm(identifier)
+            swarm.internal_endpoint = internal_endpoint
+            result = swarm.save()
+            if result:
+                print(swarm.swarm_id)
+        except Exception as e:
+            print(e, file=sys.stderr)
+            has_exception = True
+    if has_exception:
+        sys.exit(EXCEPTION_EXIT_CODE)
+
+
 def swarm_byo():
     print("Docker Cloud lets you register your own Swarm cluster. "
           "In order to do this, you have to run the Docker Cloud registration container.")

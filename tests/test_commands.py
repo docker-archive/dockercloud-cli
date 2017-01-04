@@ -1550,7 +1550,34 @@ class SwarmRmTestCase(unittest.TestCase):
     @mock.patch('dockercloudcli.commands.sys.exit')
     @mock.patch('dockercloudcli.commands.dockercloud.Utils.fetch_remote_swarm', side_effect=dockercloud.ApiError)
     def test_swarm_remove_with_exception(self, mock_fetch_remote_swarm, mock_exit):
-        service_terminate(['p4mx9lunhllmn92xc9admt6me'], False)
+        swarm_rm(['p4mx9lunhllmn92xc9admt6me'], False)
+        mock_exit.assert_called_with(EXCEPTION_EXIT_CODE)
+
+
+class SwarmUpdateTestCase(unittest.TestCase):
+    def setUp(self):
+        self.stdout = sys.stdout
+        sys.stdout = self.buf = StringIO.StringIO()
+
+    def tearDown(self):
+        sys.stdout = self.stdout
+
+    @mock.patch('dockercloudcli.commands.dockercloud.Swarm.save')
+    @mock.patch('dockercloudcli.commands.dockercloud.Utils.fetch_remote_swarm')
+    def test_swarm_remove(self, mock_fetch_remote_swarm, save):
+        swarm = dockercloudcli.commands.dockercloud.Swarm()
+        swarm.swarm_id = 'p4mx9lunhllmn92xc9admt6me'
+        mock_fetch_remote_swarm.return_value = swarm
+        save.return_value = True
+        swarm_update(['p4mx9lunhllmn92xc9admt6me'], False)
+
+        self.assertEqual(swarm.swarm_id, self.buf.getvalue().strip())
+        self.buf.truncate(0)
+
+    @mock.patch('dockercloudcli.commands.sys.exit')
+    @mock.patch('dockercloudcli.commands.dockercloud.Utils.fetch_remote_swarm', side_effect=dockercloud.ApiError)
+    def test_swarm_remove_with_exception(self, mock_fetch_remote_swarm, mock_exit):
+        swarm_update(['p4mx9lunhllmn92xc9admt6me'], False)
         mock_exit.assert_called_with(EXCEPTION_EXIT_CODE)
 
 
