@@ -1823,16 +1823,16 @@ def service_env_update(identifiers, envvars, envfiles, redeploy, sync):
 
 def swarm_ls(namespace, quiet):
     try:
-        headers = ["SWARM_ID", "NAME", "STATUS", "ENDPOINT", "DOCKER_VER"]
+        headers = ["SWARM ID", "NAME", "STATUS", "ENDPOINT", "API VER"]
         swarm_list = dockercloud.Swarm.list(namespace=namespace)
         data_list = []
         long_uuid_list = []
         for swarm in swarm_list:
             data_list.append([swarm.swarm_id, "/".join([swarm.namespace, swarm.name]),
-                              swarm.state, swarm.public_endpoint])
+                              swarm.state, swarm.public_endpoint, swarm.version])
             long_uuid_list.append(swarm.swarm_id)
         if len(data_list) == 0:
-            data_list.append(["", "", "", "", "", ""])
+            data_list.append(["", "", "", "", "", "", ""])
         if quiet:
             for uuid in long_uuid_list:
                 print(uuid)

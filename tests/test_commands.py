@@ -1417,6 +1417,17 @@ class NodeClusterShowTypesTestCase(unittest.TestCase):
         self.buf.truncate(0)
 
     @mock.patch('dockercloudcli.commands.dockercloud.NodeType.list')
+    def test_nodecluster_show_types_with_region_filter(self, mock_list):
+        output = '''NAME    LABEL    PROVIDER      REGIONS
+512mb   512MB    digitalocean  ams1, sfo1, nyc2, ams2, sgp1, lon1, nyc3, nyc1
+1gb     1GB      digitalocean  ams1, sfo1, nyc2, ams2, sgp1, lon1, nyc3, nyc1'''
+        mock_list.return_value = self.nodetypelist
+        nodecluster_show_types('', 'nyc3')
+
+        self.assertEqual(output, self.buf.getvalue().strip())
+        self.buf.truncate(0)
+
+    @mock.patch('dockercloudcli.commands.dockercloud.NodeType.list')
     def test_nodecluster_show_types_with_filters(self, mock_list):
         mock_list.return_value = self.nodetypelist
         nodecluster_show_types('aws', 'nyc3')
@@ -1478,6 +1489,7 @@ class SwarmListTestCase(unittest.TestCase):
         swarm1.swarm_id = "53kaclovs67uw4u6r53ekjd79"
         swarm1.state = "Unavailable"
         swarm1.public_endpoint = "53kaclovs67uw4u6r53ekjd79.tifayuki.docker.cloud"
+        swarm1.version = "1.24"
 
         swarm2 = dockercloudcli.commands.dockercloud.Swarm()
         swarm2.name = "p4mx9lunhllmn92xc9admt6me"
@@ -1485,6 +1497,7 @@ class SwarmListTestCase(unittest.TestCase):
         swarm2.swarm_id = "p4mx9lunhllmn92xc9admt6me"
         swarm2.state = "Unavailable"
         swarm2.public_endpoint = "p4mx9lunhllmn92xc9admt6me.tifayuki.docker.cloud"
+        swarm2.version = "1.25"
         self.swarmList = [swarm1, swarm2]
 
     def tearDown(self):
@@ -1492,9 +1505,9 @@ class SwarmListTestCase(unittest.TestCase):
 
     @mock.patch('dockercloudcli.commands.dockercloud.Swarm.list')
     def test_swarm_ls(self, mock_list):
-        output = u'''SWARM_ID                   NAME                                STATUS       ENDPOINT
-53kaclovs67uw4u6r53ekjd79  tifayuki/53kaclovs67uw4u6r53ekjd79  Unavailable  53kaclovs67uw4u6r53ekjd79.tifayuki.docker.cloud
-p4mx9lunhllmn92xc9admt6me  tifayuki/p4mx9lunhllmn92xc9admt6me  Unavailable  p4mx9lunhllmn92xc9admt6me.tifayuki.docker.cloud'''
+        output = u'''SWARM ID                   NAME                                STATUS       ENDPOINT                                           API VER
+53kaclovs67uw4u6r53ekjd79  tifayuki/53kaclovs67uw4u6r53ekjd79  Unavailable  53kaclovs67uw4u6r53ekjd79.tifayuki.docker.cloud       1.24
+p4mx9lunhllmn92xc9admt6me  tifayuki/p4mx9lunhllmn92xc9admt6me  Unavailable  p4mx9lunhllmn92xc9admt6me.tifayuki.docker.cloud       1.25'''
         mock_list.return_value = self.swarmList
         swarm_ls('', False)
 

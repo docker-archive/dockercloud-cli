@@ -795,15 +795,15 @@ def add_swarm_parser(subparsers):
     # docker-cloud swarm inspect
     inspect_parser = swarm_subparser.add_parser('inspect', help='Inspect a Swarm cluster',
                                                 description='Inspect a Swarm cluster')
-    inspect_parser.add_argument('identifier', help="Swarm cluster's <swarm_id> or [namespace/]<name>", nargs='+')
+    inspect_parser.add_argument('identifier', help="Swarm cluster's <Swarm ID> or [namespace/]<name>", nargs='+')
 
     # docker-cloud swarm ls
     list_parser = swarm_subparser.add_parser('ls', help='List Swarm clusters', description='List Swarm clusters')
-    list_parser.add_argument('-q', '--quiet', help='print only Swarm id', action='store_true')
-    list_parser.add_argument('-n', '--namespace', help='list swarm clusters under the under the namespace')
+    list_parser.add_argument('-q', '--quiet', help='Print only Swarm IDs', action='store_true')
+    list_parser.add_argument('-n', '--namespace', help='List Swarm clusters under the under the namespace')
 
     # docker-cloud swarm rm
     rm_parser = swarm_subparser.add_parser('rm', help='Remove a Swarm', description='Remove a Swarm')
-    rm_parser.add_argument('identifier', help="Swarm cluster's <id> or [namespace/]<name>", nargs='+')
-    rm_parser.add_argument('--sync', help='block the command until the async operation has finished',
+    rm_parser.add_argument('identifier', help="<Swarm cluster's ID> or [namespace/]<name>", nargs='+')
+    rm_parser.add_argument('--sync', help='Block the command until the async operation has finished',
                            action='store_true')
