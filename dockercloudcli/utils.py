@@ -65,9 +65,9 @@ def add_unicode_symbol_to_state(state):
         return u"\u2699 " + state
     elif state in ["Start failed", "Stopped with errors"]:
         return u"\u0021 " + state
-    elif state == "Terminated":
+    elif state in ["Terminated", "Removed"]:
         return u"\u2718 " + state
-    elif state == "Unreachable":
+    elif state in ["Unreachable", "Unavailable"]:
         return u"\u2753 " + state
     return state
 

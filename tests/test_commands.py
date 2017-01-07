@@ -1505,9 +1505,9 @@ class SwarmListTestCase(unittest.TestCase):
 
     @mock.patch('dockercloudcli.commands.dockercloud.Swarm.list')
     def test_swarm_ls(self, mock_list):
-        output = u'''SWARM ID                   NAME                                STATUS       ENDPOINT                                           API VER
-53kaclovs67uw4u6r53ekjd79  tifayuki/53kaclovs67uw4u6r53ekjd79  Unavailable  53kaclovs67uw4u6r53ekjd79.tifayuki.docker.cloud       1.24
-p4mx9lunhllmn92xc9admt6me  tifayuki/p4mx9lunhllmn92xc9admt6me  Unavailable  p4mx9lunhllmn92xc9admt6me.tifayuki.docker.cloud       1.25'''
+        output = u'''SWARM ID                   NAME                                STATUS         ENDPOINT                                           API VER
+53kaclovs67uw4u6r53ekjd79  tifayuki/53kaclovs67uw4u6r53ekjd79  \u2753 Unavailable  53kaclovs67uw4u6r53ekjd79.tifayuki.docker.cloud       1.24
+p4mx9lunhllmn92xc9admt6me  tifayuki/p4mx9lunhllmn92xc9admt6me  \u2753 Unavailable  p4mx9lunhllmn92xc9admt6me.tifayuki.docker.cloud       1.25'''
         mock_list.return_value = self.swarmList
         swarm_ls('', False)
 
@@ -1625,3 +1625,34 @@ class SwarmInspectTestCase(unittest.TestCase):
 
         self.assertEqual(' '.join(output.split()), ' '.join(self.buf.getvalue().strip().split()))
         self.buf.truncate(0)
+
+    @mock.patch('dockercloudcli.commands.dockercloud.Swarm.save')
+    def test_swarm_create_with_namespace(self, mock_save):
+        swarm = swarm_create("provider", "region", "name", "manager_number", "manager_type",
+                             "worker_number", "worker_type", "ssh_key", namespace="namespace")
+
+        self.assertEquals(swarm.provider, "provider")
+        self.assertEquals(swarm.region, "region")
+        self.assertEquals(swarm.name, "name")
+        self.assertEquals(swarm.number_of_managers, "manager_number")
+        self.assertEquals(swarm.number_of_workers, "worker_number")
+        self.assertEquals(swarm.manager_instance_type, "manager_type")
+        self.assertEquals(swarm.worker_instance_type, "worker_type")
+        self.assertEquals(swarm.ssh_key, "ssh_key")
+        self.assertEquals(swarm._namespace, "namespace")
+
+
+@mock.patch('dockercloudcli.commands.dockercloud.Swarm.save')
+def test_swarm_create_without_namespace(self, mock_save):
+    swarm = swarm_create("provider", "region", "name", "manager_number", "manager_type",
+                         "worker_number", "worker_type", "ssh_key")
+
+    self.assertEquals(swarm.provider, "provider")
+    self.assertEquals(swarm.region, "region")
+    self.assertEquals(swarm.name, "name")
+    self.assertEquals(swarm.number_of_managers, "manager_number")
+    self.assertEquals(swarm.number_of_workers, "worker_number")
+    self.assertEquals(swarm.manager_instance_type, "manager_type")
+    self.assertEquals(swarm.worker_instance_type, "worker_type")
+    self.assertEquals(swarm.ssh_key, "ssh_key")
+    self.assertEquals(swarm._namespace, "")

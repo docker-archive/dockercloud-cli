@@ -800,7 +800,7 @@ def add_swarm_parser(subparsers):
     # docker-cloud swarm ls
     list_parser = swarm_subparser.add_parser('ls', help='List Swarm clusters', description='List Swarm clusters')
     list_parser.add_argument('-q', '--quiet', help='Print only Swarm IDs', action='store_true')
-    list_parser.add_argument('-n', '--namespace', help='List Swarm clusters under the under the namespace')
+    list_parser.add_argument('-n', '--namespace', help='List Swarm clusters under the this namespace')
 
     # docker-cloud swarm rm
     rm_parser = swarm_subparser.add_parser('rm', help='Remove a Swarm', description='Remove a Swarm')
@@ -813,3 +813,16 @@ def add_swarm_parser(subparsers):
                                                description='Update a Swarm cluster information')
     update_parser.add_argument('identifier', help="Swarm cluster's <Swarm ID> or [namespace/]<name>", nargs='+')
     update_parser.add_argument('--internal-endpoint', help='The internal endpoint of the Swarm cluster')
+
+    # docker-cloud swarm create
+    create_parser = swarm_subparser.add_parser('create', help='Create a new Swarm cluster on public cloud',
+                                               description='Create a new Swarm cluster on public cloud')
+    create_parser.add_argument('name', help='Name of the Swarm cluster to create')
+    create_parser.add_argument('provider', help='Name of the provider, e.g. "aws"')
+    create_parser.add_argument('--region', help='Name of the region, e.g. "sa-east-1"')
+    create_parser.add_argument('--manager-type', help='Instance type of the Swarm manger, e.g. "t2.micro"')
+    create_parser.add_argument('--manager-number', help='Number of Swarm managers to create')
+    create_parser.add_argument('--worker-type', help='Instance type of the Swarm worker, e.g. "t2.micro"')
+    create_parser.add_argument('--worker-number', help='Number of Swarm workers to create')
+    create_parser.add_argument('--ssh-key', help='Name of the SSH key on AWS, allowing SSH to your remote cluster')
+    create_parser.add_argument('--namespace', help='Create Swarm clusters under this namespace')

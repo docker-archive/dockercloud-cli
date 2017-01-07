@@ -83,7 +83,7 @@ def patch_help_option(argv=sys.argv):
         elif args[1] == 'stack' and args[2] in ['inspect', 'redeploy', 'terminate', 'start', 'stop', 'update',
                                                 'export']:
             args.append('-h')
-        elif args[1] == 'swarm' and args[2] in ['inspect', 'rm', 'update']:
+        elif args[1] == 'swarm' and args[2] in ['inspect', 'rm', 'update', 'create']:
             args.append('-h')
     elif len(args) == 4:
         if args[1] == 'service' and args[2] == 'env':
@@ -304,6 +304,9 @@ def dispatch_cmds(args):
             commands.swarm_byo()
         elif args.subcmd == 'update':
             commands.swarm_update(args.identifier, args.internal_endpoint)
+        elif args.subcmd == "create":
+            commands.swarm_create(args.provider, args.region, args.name, args.manager_number, args.manager_type,
+                                  args.worker_number, args.worker_type, args.ssh_key, args.namespace)
     elif args.cmd == 'up':
         commands.stack_up(args.name, args.file, args.sync)
 

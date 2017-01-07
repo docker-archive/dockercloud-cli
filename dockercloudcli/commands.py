@@ -1829,7 +1829,7 @@ def swarm_ls(namespace, quiet):
         long_uuid_list = []
         for swarm in swarm_list:
             data_list.append([swarm.swarm_id, "/".join([swarm.namespace, swarm.name]),
-                              swarm.state, swarm.public_endpoint, swarm.version])
+                              utils.add_unicode_symbol_to_state(swarm.state), swarm.public_endpoint, swarm.version])
             long_uuid_list.append(swarm.swarm_id)
         if len(data_list) == 0:
             data_list.append(["", "", "", "", "", "", ""])
@@ -1896,3 +1896,30 @@ def swarm_byo():
     print()
     print("\tdocker run -ti --rm -v /var/run/docker.sock:/var/run/docker.sock dockercloud/registration")
     print()
+
+
+def swarm_create(provider, region, name, manager_number, manager_type, worker_number, worker_type, ssh_key,
+                 namespace=""):
+    kwargs = {"provider": provider, "region": region}
+    if name:
+        kwargs["name"] = name
+    if manager_number:
+        kwargs["number_of_managers"] = manager_number
+    if manager_type:
+        kwargs["manager_instance_type"] = manager_type
+    if manager_number:
+        kwargs["number_of_workers"] = worker_number
+    if manager_type:
+        kwargs["worker_instance_type"] = worker_type
+    if ssh_key:
+        kwargs["ssh_key"] = ssh_key
+
+    try:
+        swarm = dockercloud.Swarm.create(**kwargs)
+        if namespace:
+            swarm._namespace = namespace
+        swarm.save()
+        return swarm
+    except Exception as e:
+        print(e, file=sys.stderr)
+        sys.exit(EXCEPTION_EXIT_CODE)
