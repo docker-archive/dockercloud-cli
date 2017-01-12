@@ -1505,9 +1505,9 @@ class SwarmListTestCase(unittest.TestCase):
 
     @mock.patch('dockercloudcli.commands.dockercloud.Swarm.list')
     def test_swarm_ls(self, mock_list):
-        output = u'''SWARM ID                   NAME                                STATUS         ENDPOINT                                           API VER
-53kaclovs67uw4u6r53ekjd79  tifayuki/53kaclovs67uw4u6r53ekjd79  \u2753 Unavailable  53kaclovs67uw4u6r53ekjd79.tifayuki.docker.cloud       1.24
-p4mx9lunhllmn92xc9admt6me  tifayuki/p4mx9lunhllmn92xc9admt6me  \u2753 Unavailable  p4mx9lunhllmn92xc9admt6me.tifayuki.docker.cloud       1.25'''
+        output = u'''SWARM ID                   NAME                                STATUS         ENDPOINT
+53kaclovs67uw4u6r53ekjd79  tifayuki/53kaclovs67uw4u6r53ekjd79  \u2753 Unavailable  53kaclovs67uw4u6r53ekjd79.tifayuki.docker.cloud
+p4mx9lunhllmn92xc9admt6me  tifayuki/p4mx9lunhllmn92xc9admt6me  \u2753 Unavailable  p4mx9lunhllmn92xc9admt6me.tifayuki.docker.cloud'''
         mock_list.return_value = self.swarmList
         swarm_ls('', False)
 
