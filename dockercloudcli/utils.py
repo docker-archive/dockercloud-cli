@@ -68,7 +68,7 @@ def add_unicode_symbol_to_state(state):
     elif state in ["Terminated", "Removed"]:
         return u"\u2718 " + state
     elif state in ["Unreachable", "Unavailable"]:
-        return u"\u2753 " + state
+        return u"\u2754 " + state
     return state
 
 
