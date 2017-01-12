@@ -784,39 +784,40 @@ def add_stack_parser(subparsers):
 
 def add_swarm_parser(subparsers):
     # docker-cloud swarm
-    swarm_parser = subparsers.add_parser('swarm', help='Swarm-related operations',
-                                         description='Swarm-related operations')
+    swarm_parser = subparsers.add_parser('swarm', help='Swarm-related operations (BETA)',
+                                         description='Swarm-related operations (BETA)')
     swarm_subparser = swarm_parser.add_subparsers(title='Docker Cloud Swarm commands', dest='subcmd')
 
     # docker-cloud swarm byo
-    swarm_subparser.add_parser('byo', help='Instructions on how to Bring Your Own Swarm cluster to Docker Cloud',
-                               description='Instructions on how to Bring Your Own Swarm cluster to Docker Cloud')
+    swarm_subparser.add_parser('byo', help='Instructions on how to Bring Your Own Swarm cluster to Docker Cloud (BETA)',
+                               description='Instructions on how to Bring Your Own Swarm cluster to Docker Cloud (BETA)')
 
     # docker-cloud swarm inspect
-    inspect_parser = swarm_subparser.add_parser('inspect', help='Inspect a Swarm cluster',
-                                                description='Inspect a Swarm cluster')
+    inspect_parser = swarm_subparser.add_parser('inspect', help='Inspect a Swarm cluster (BETA)',
+                                                description='Inspect a Swarm cluster (BETA)')
     inspect_parser.add_argument('identifier', help="Swarm cluster's <Swarm ID> or [namespace/]<name>", nargs='+')
 
     # docker-cloud swarm ls
-    list_parser = swarm_subparser.add_parser('ls', help='List Swarm clusters', description='List Swarm clusters')
+    list_parser = swarm_subparser.add_parser('ls', help='List Swarm clusters (BETA)',
+                                             description='List Swarm clusters (BETA)')
     list_parser.add_argument('-q', '--quiet', help='Print only Swarm IDs', action='store_true')
     list_parser.add_argument('-n', '--namespace', help='List Swarm clusters under the this namespace')
 
     # docker-cloud swarm rm
-    rm_parser = swarm_subparser.add_parser('rm', help='Remove a Swarm', description='Remove a Swarm')
+    rm_parser = swarm_subparser.add_parser('rm', help='Remove a Swarm (BETA)', description='Remove a Swarm (BETA)')
     rm_parser.add_argument('identifier', help="Swarm cluster's <Swarm ID> or [namespace/]<name>", nargs='+')
     rm_parser.add_argument('--sync', help='Block the command until the async operation has finished',
                            action='store_true')
 
     # docker-cloud swarm update
-    update_parser = swarm_subparser.add_parser('update', help='Update a Swarm cluster information',
-                                               description='Update a Swarm cluster information')
+    update_parser = swarm_subparser.add_parser('update', help='Update a Swarm cluster information (BETA)',
+                                               description='Update a Swarm cluster information (BETA)')
     update_parser.add_argument('identifier', help="Swarm cluster's <Swarm ID> or [namespace/]<name>", nargs='+')
     update_parser.add_argument('--internal-endpoint', help='The internal endpoint of the Swarm cluster')
 
     # docker-cloud swarm create
-    create_parser = swarm_subparser.add_parser('create', help='Create a new Swarm cluster on public cloud',
-                                               description='Create a new Swarm cluster on public cloud')
+    create_parser = swarm_subparser.add_parser('create', help='Create a new Swarm cluster on public cloud (BETA)',
+                                               description='Create a new Swarm cluster on public cloud (BETA)')
     create_parser.add_argument('name', help='Name of the Swarm cluster to create')
     create_parser.add_argument('provider', help='Name of the provider, e.g. "aws"')
     create_parser.add_argument('--region', help='Name of the region, e.g. "sa-east-1"')
