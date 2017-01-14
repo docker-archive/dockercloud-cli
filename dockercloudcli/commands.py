@@ -113,7 +113,7 @@ def service_ps(quiet, status, stack):
                               stacks.get(service.stack)])
             long_uuid_list.append(service.uuid)
         if len(data_list) == 0:
-            data_list.append(["", "", "", "", "", ""])
+            data_list = [""] * len(headers)
 
         if quiet:
             for uuid in long_uuid_list:
@@ -664,7 +664,7 @@ def container_ps(quiet, status, service, no_trunc):
                               stacks.get(services.get(container.service))])
             long_uuid_list.append(container.uuid)
         if len(data_list) == 0:
-            data_list.append(["", "", "", "", "", "", "", "", ""])
+            data_list = [""] * len(headers)
         if quiet:
             for uuid in long_uuid_list:
                 print(uuid)
@@ -745,7 +745,7 @@ def repository_ls(quiet):
                 data_list.append(data)
                 name_list.append(repository.name)
         else:
-            data_list.append(["", ""])
+            data_list = [""] * len(headers)
 
         if quiet:
             for name in name_list:
@@ -849,7 +849,7 @@ def node_ls(quiet):
                               cluster_name, node.docker_version])
             long_uuid_list.append(node.uuid)
         if len(data_list) == 0:
-            data_list.append(["", "", "", "", "", ""])
+            data_list = [""] * len(headers)
         if quiet:
             for uuid in long_uuid_list:
                 print(uuid)
@@ -960,7 +960,7 @@ def nodecluster_ls(quiet):
                               nodecluster.target_num_nodes])
             long_uuid_list.append(nodecluster.uuid)
         if len(data_list) == 0:
-            data_list.append(["", "", "", "", "", "", "", ""])
+            data_list = [""] * len(headers)
         if quiet:
             for uuid in long_uuid_list:
                 print(uuid)
@@ -998,7 +998,7 @@ def nodecluster_show_providers(quiet):
             data_list.append([provider.name, provider.label])
 
         if len(data_list) == 0:
-            data_list.append(["", ""])
+            data_list = [""] * len(headers)
         if quiet:
             for name in name_list:
                 print(name)
@@ -1021,7 +1021,7 @@ def nodecluster_show_regions(provider):
             data_list.append([region.name, region.label, provider_name])
 
         if len(data_list) == 0:
-            data_list.append(["", "", ""])
+            data_list = [""] * len(headers)
         utils.tabulate_result(data_list, headers)
     except Exception as e:
         print(e, file=sys.stderr)
@@ -1045,7 +1045,7 @@ def nodecluster_show_types(provider, region):
                               ", ".join(regions)])
 
         if len(data_list) == 0:
-            data_list.append(["", "", "", ""])
+            data_list = [""] * len(headers)
         utils.tabulate_result(data_list, headers)
     except Exception as e:
         print(e, file=sys.stderr)
@@ -1144,7 +1144,7 @@ def nodecluster_az(quiet):
             long_uuid_list.append(az.name)
 
         if len(data_list) == 0:
-            data_list.append(["", "", "", "", ""])
+            data_list = [""] * len(headers)
 
         if quiet:
             for uuid in long_uuid_list:
@@ -1413,7 +1413,7 @@ def stack_ls(quiet):
             long_uuid_list.append(stack.uuid)
 
         if len(data_list) == 0:
-            data_list.append(["", "", "", "", ""])
+            data_list = [""] * len(headers)
 
         if quiet:
             for uuid in long_uuid_list:
@@ -1582,7 +1582,7 @@ def action_ls(quiet, last):
             long_uuid_list.append(action.uuid)
 
         if len(data_list) == 0:
-            data_list.append(["", "", "", "", ""])
+            data_list = [""] * len(headers)
 
         if quiet:
             for uuid in long_uuid_list:
@@ -1675,7 +1675,7 @@ def service_env_ls(identifier, quiet, origin_user, origin_image, origin_dockercl
                 key_value_list.append("%s=%s" % (envvars["key"], envvars["value"]))
 
         if len(data_list) == 0:
-            data_list.append(["", "", ""])
+            data_list = [""] * len(headers)
 
         if quiet:
             for uuid in key_value_list:
@@ -1832,7 +1832,7 @@ def swarm_ls(namespace, quiet):
                               utils.add_unicode_symbol_to_state(swarm.state), swarm.public_endpoint])
             long_uuid_list.append(swarm.swarm_id)
         if len(data_list) == 0:
-            data_list.append(["", "", "", "", "", ""])
+            data_list = [""] * len(headers)
         if quiet:
             for uuid in long_uuid_list:
                 print(uuid)
