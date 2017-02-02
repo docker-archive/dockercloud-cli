@@ -7,4 +7,7 @@ RUN cd dockercloud && \
     docker-cloud -v
 WORKDIR /root
 
+LABEL io.whalebrew.name docker-cloud
+LABEL io.whalebrew.config.volumes '["~/.docker:/root/.docker:ro"]'
+
 ENTRYPOINT ["docker-cloud"]
