@@ -13,7 +13,7 @@ requirements =[
     "PyYAML >=3, < 4",
     "ago >=0.0.6, < 0.1",
     "python-dateutil >= 2, <3",
-    "python-dockercloud >= 1.0.8, <2",
+    "python-dockercloud >= 1.0.11, <2",
     "tabulate >= 0.7, <1"
 ]
 
